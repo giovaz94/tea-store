@@ -17,4 +17,12 @@ In order to work properly, the service needs to be configured with the following
 
 - `SERVICE_NAME`: The name of the service. This is used to identify the service in the metrics and in the deployment infrastructure.
 - `SERVICE_PORT`: The port on which the service will listen for incoming requests. This is used to configure the Express.js server.
+- `OUTPUT_SERVICES`: A Json-encoded map of microservices urls and the number of times that should be called each time a request is received. The map should be in the following format:
+  ```json
+  {
+    "url1": 2,
+    "url2": 3
+  }
+  ```
+  This means that when a request is received, the service will call `url1` twice and `ulr2` three times.
 - `MCL`: Maximum Computational Workload. This is used to simulate the delay in processing requests.
