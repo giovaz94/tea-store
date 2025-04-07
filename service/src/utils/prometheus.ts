@@ -41,3 +41,19 @@ export function createLostMessageCounter(): Counter<string> {
     ["service", "reason"],
   );
 }
+
+export function createBehaviourCounter(): Counter<string> {
+  return createCounter(
+    "behaviour_execution",
+    "Total number of behaviour execution",
+    ["service", "reason"],
+  );
+}
+
+export function createBehaviourTimeCounter(): Counter<string> {
+  return createCounter(
+    "behaviour_time_execution",
+    "Time needed to execute the behaviour",
+    ["service", "reason"],
+  );
+}
