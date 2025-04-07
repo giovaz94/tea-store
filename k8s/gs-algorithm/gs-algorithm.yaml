@@ -1,0 +1,83 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: gs-service-account
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: default
+  name: pod-creator
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "pods/status"]
+    verbs: ["create", "get", "list", "delete", "watch", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pod-creator-binding
+  namespace: default
+subjects:
+  - kind: ServiceAccount
+    name: gs-service-account
+roleRef:
+  kind: Role
+  name: pod-creator
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gs-algorithm
+spec:
+  selector:
+    matchLabels:
+      app: gs-algorithm
+  template:
+    metadata:
+      labels:
+        app: gs-algorithm
+    spec:
+      serviceAccountName: gs-service-account
+      containers:
+        - name: gs-algorithm
+          image: giovaz94/gs-implmentation:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+          env:
+            - name: INCLUSTER_CONFIG
+              value: "true"
+            - name: K_BIG
+              value: "20"
+            - name:  SLEEP
+              value: "10"
+            - name: K
+              value: "10"
+            - name: ERROR_LIMIT
+              value: "3"
+            - name: PROACTIVE
+              value: "true"
+            - name: PROACTIVE_REACTIVE
+              value: "false"
+            - name: PROMETHEUS_SERVICE_ADDRESS
+              value: "prometheus-service.monitoring"
+            - name: PROMETHEUS_SERVICE_PORT
+              value: "8080"
+
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gs-algorithm-service
+spec:
+  selector:
+    app: gs-algorithm
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
