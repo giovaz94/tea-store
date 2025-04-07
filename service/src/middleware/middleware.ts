@@ -11,6 +11,8 @@ const outputServices: Map<string, string> = new Map(
 );
 const serviceName: string = process.env.SERVICE_NAME || "undefinedService";
 
+const serviceExec: number = parseInt(process.env.SERVICE_NAME, 10) || Math.floor(Math.random() * 5) + 1; //you must specify for all services 1, for webUI do not specify anything
+
 if (process.env.MCL === undefined) {
   throw new Error("The MCL for the following service isn't defined");
 }
@@ -21,24 +23,24 @@ const incomingMessages = createIncomingMessageCounter(serviceName);
 
 export const handleRequest: RequestHandler = async (_, res) => {
   incomingMessages.inc();
-
-  for (const [serviceKey, url] of outputServices.entries()) {
-    const n = parseInt(serviceKey, 10);
-    console.log(`Sending ${n} requests to ${url}`);
-
-    for (let i = 0; i < n; i++) {
-      try {
-        await axios.post(url);
-      } catch (error: unknown) {
-        const errorMessage =
-          error instanceof Error ? error.message : "Unknown Error";
-        console.error(`Error sending request to ${url}: ${errorMessage}`);
-        lostMessage.inc();
+  let sleepTime = calculateSleepTime(mcl);
+  let execution = serviceExec;
+  await sleep(sleepTime);
+  while (execution > 0) {
+    for (const [serviceKey, url] of outputServices.entries()) {
+      const n = parseInt(serviceKey, 10);
+      console.log(`Sending ${n} requests to ${url}`);
+      for (let i = 0; i < n; i++) {
+        try {
+          await axios.post(url);
+        } catch (error: unknown) {
+          const errorMessage = error instanceof Error ? error.message : "Unknown Error";
+          console.error(`Error sending request to ${url}: ${errorMessage}`);
+          lostMessage.inc();
+        }
       }
     }
+    execution--;
   }
-
-  let sleepTime = calculateSleepTime(mcl);
-  await sleep(sleepTime);
   res.status(200).send("OK");
 };
