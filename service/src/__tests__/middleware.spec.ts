@@ -26,9 +26,10 @@ describe("handleRequest middleware", () => {
   it("should send POST requests to each service the correct number of times", async () => {
     process.env.MCL = "1000";
     process.env.OUTPUT_SERVICES = JSON.stringify({
-      "3": "http://service1.example.com",
-      "2": "http://service2.example.com",
+      "http://service1.example.com": "3",
+      "http://service2.example.com": "2",
     });
+    process.env.SERVICE_EXECUTION = 1;
 
     const { handleRequest } = await import("#middleware/middleware.js");
     const serviceUtils = await import("#utils/service.js");
@@ -54,9 +55,10 @@ describe("handleRequest middleware", () => {
   it("should handle failed HTTP requests gracefully", async () => {
     process.env.MCL = "1000";
     process.env.OUTPUT_SERVICES = JSON.stringify({
-      "3": "http://service1.example.com",
-      "2": "http://service2.example.com",
+      "http://service1.example.com": "3",
+      "http://service2.example.com": "2",
     });
+    process.env.SERVICE_EXECUTION = 1;
 
     const { handleRequest } = await import("#middleware/middleware.js");
 
@@ -81,6 +83,7 @@ describe("handleRequest middleware", () => {
   it("should work with empty OUTPUT_SERVICES", async () => {
     process.env.MCL = "1000";
     process.env.OUTPUT_SERVICES = "{}";
+    process.env.SERVICE_EXECUTION = 1;
 
     const { handleRequest } = await import("#middleware/middleware.js");
     const serviceUtils = await import("#utils/service.js");
@@ -104,9 +107,10 @@ describe("handleRequest middleware", () => {
   it("should handle errors and continue with remaining requests", async () => {
     process.env.MCL = "1000";
     process.env.OUTPUT_SERVICES = JSON.stringify({
-      "3": "http://service1.example.com",
-      "2": "http://service2.example.com",
+       "http://service1.example.com": "3",
+       "http://service2.example.com": "2",
     });
+    process.env.SERVICE_EXECUTION = 1;
 
     const { handleRequest } = await import("#middleware/middleware.js");
     const res = {

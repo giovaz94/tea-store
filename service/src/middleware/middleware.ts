@@ -11,7 +11,7 @@ const outputServices: Map<string, string> = new Map(
 );
 const serviceName: string = process.env.SERVICE_NAME || "undefinedService";
 
-const serviceExec: number = parseInt(process.env.SERVICE_NAME, 10) || Math.floor(Math.random() * 5) + 1; //you must specify for all services 1, for webUI do not specify anything
+const serviceExec: number = parseInt(process.env.SERVICE_EXECUTION, 10) || Math.floor(Math.random() * 5) + 1; //you must specify for all services 1, for webUI do not specify anything
 
 if (process.env.MCL === undefined) {
   throw new Error("The MCL for the following service isn't defined");
@@ -25,10 +25,11 @@ export const handleRequest: RequestHandler = async (_, res) => {
   incomingMessages.inc();
   let sleepTime = calculateSleepTime(mcl);
   let execution = serviceExec;
+  console.log(outputServices.entries());
   await sleep(sleepTime);
   while (execution > 0) {
-    for (const [serviceKey, url] of outputServices.entries()) {
-      const n = parseInt(serviceKey, 10);
+    for (const [url, numberOfRequests] of outputServices.entries()) {
+      const n = parseInt(numberOfRequests, 10);
       console.log(`Sending ${n} requests to ${url}`);
       for (let i = 0; i < n; i++) {
         try {
