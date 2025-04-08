@@ -6,7 +6,7 @@ import {
   createLostMessageCounter,
 } from "#utils/prometheus.js";
 import { createBehaviourCounter, createBehaviourTimeCounter } from "../utils/prometheus";
-import { start } from "repl";
+import { Counter } from "prom-client";
 
 const outputServices: Map<string, string> = new Map(
   Object.entries(JSON.parse(process.env.OUTPUT_SERVICES || "{}")),
@@ -22,8 +22,8 @@ const mcl: number = parseInt(process.env.MCL as string, 10);
 
 const lostMessage = createLostMessageCounter();
 const incomingMessages = createIncomingMessageCounter(serviceName);
-let behaviourCounter;
-let behaviourTimeCounter;
+let behaviourCounter: Counter<string>;
+let behaviourTimeCounter: Counter<string>;
 if (serviceName === "webUI") {
   behaviourCounter = createBehaviourCounter();
   behaviourTimeCounter = createBehaviourTimeCounter();

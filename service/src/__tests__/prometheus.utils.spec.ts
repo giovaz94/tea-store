@@ -5,7 +5,7 @@ import {
   createSimpleCounter,
   createIncomingMessageCounter,
   createLostMessageCounter,
-} from "#utils/prometheus";
+} from "#utils/prometheus.js";
 
 vi.mock("prom-client", () => {
   const MockCounter = vi.fn().mockImplementation(() => ({
