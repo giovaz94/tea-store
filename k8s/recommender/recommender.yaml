@@ -13,8 +13,8 @@ spec:
     spec:
       containers:
         - name: recommender
-          recommender: giovaz94/tea-store-general
-          recommenderPullPolicy: Always
+          image: giovaz94/tea-store-general
+          imagePullPolicy: Always
           ports:
             - containerPort: 8005
           env:

@@ -25,7 +25,7 @@ spec:
             - name: PORT
               value: "8002"
             - name: OUTPUT_SERVICES
-              value: '{"persistence":"http://persistence-service:8003/request"}'
+              value: '{"http://persistence-service:8003/request":"1"}'
       restartPolicy: Always
 ---
 apiVersion: v1
