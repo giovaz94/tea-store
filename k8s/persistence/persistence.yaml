@@ -16,14 +16,16 @@ spec:
           image: giovaz94/tea-store-general
           imagePullPolicy: Always
           ports:
-            - containerPort: 8003
+            - containerPort: 80
           env:
             - name: MCL
               value: "190"
             - name: SERVICE_NAME
               value: "persistence"
             - name: PORT
-              value: "8003"
+              value: "80"
+            - name: OUTPUT_SERVICES
+              value: '{}'
       restartPolicy: Always
 ---
 apiVersion: v1
@@ -35,6 +37,6 @@ spec:
     app: persistence
   ports:
     - protocol: TCP
-      port: 8003
-      targetPort: 8003
+      port: 80
+      targetPort: 80
 

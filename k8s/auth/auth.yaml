@@ -13,19 +13,27 @@ spec:
     spec:
       containers:
         - name: auth
+<<<<<<< HEAD
           image: giovaz94/tea-store-general #change this
+=======
+          image: giovaz94/tea-store-general
+>>>>>>> feat: update Dockerfile for the general service and k8s manifests
           imagePullPolicy: Always
           ports:
-            - containerPort: 8002
+            - containerPort: 80
           env:
             - name: MCL
               value: "190"
             - name: SERVICE_NAME
               value: "auth"
             - name: PORT
-              value: "8002"
+              value: "80"
             - name: OUTPUT_SERVICES
+<<<<<<< HEAD
               value: '{"http://persistence-service:8003/request":"1"}'
+=======
+              value: '{"http://persistence-service/request":"1"}'
+>>>>>>> feat: update Dockerfile for the general service and k8s manifests
       restartPolicy: Always
 ---
 apiVersion: v1
@@ -37,6 +45,6 @@ spec:
     app: auth
   ports:
     - protocol: TCP
-      port: 8002
-      targetPort: 8002
+      port: 80
+      targetPort: 80
 

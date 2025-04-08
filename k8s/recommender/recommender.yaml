@@ -16,14 +16,16 @@ spec:
           image: giovaz94/tea-store-general
           imagePullPolicy: Always
           ports:
-            - containerPort: 8005
+            - containerPort: 80
           env:
             - name: MCL
               value: "190"
             - name: SERVICE_NAME
               value: "recommender"
             - name: PORT
-              value: "8005"
+              value: "80"
+            - name: OUTPUT_SERVICES
+              value: '{}'
       restartPolicy: Always
 ---
 apiVersion: v1
@@ -35,6 +37,6 @@ spec:
     app: recommender
   ports:
     - protocol: TCP
-      port: 8005
-      targetPort: 8005
+      port: 80
+      targetPort: 80
 

@@ -16,16 +16,16 @@ spec:
           image: giovaz94/tea-store-general
           imagePullPolicy: Always
           ports:
-            - containerPort: 8001
+            - containerPort: 80
           env:
             - name: MCL
               value: "150"
             - name: SERVICE_NAME
               value: "webui"
             - name: PORT
-              value: "8001"
+              value: "80"
             - name: OUTPUT_SERVICES
-              value: '{"http://recommender-service:8005/request":"1","http://image-service:8004/request":"2","http://persistence-service:8003/request":"1","http://auth-service:8002/request":"1"}'
+              value: '{"http://persistence-service/request":"1", "http://recommender-service/request":"1", "http://image-service/request":"2"}'
       restartPolicy: Always
 ---
 # apiVersion: v1
@@ -49,7 +49,6 @@ spec:
     app: webui
   ports:
     - protocol: TCP
-      port: 8001
-      targetPort: 8001
-      nodePort: 30001  # Choose a port in the 30000–32767 range
+      port: 80
+      targetPort: 80
 

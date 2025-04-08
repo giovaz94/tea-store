@@ -16,14 +16,16 @@ spec:
           image: giovaz94/tea-store-general
           imagePullPolicy: Always
           ports:
-            - containerPort: 8004
+            - containerPort: 80
           env:
             - name: MCL
               value: "190"
             - name: SERVICE_NAME
               value: "image"
             - name: PORT
-              value: "8004"
+              value: "80"
+            - name: OUTPUT_SERVICES
+              value: '{}'
       restartPolicy: Always
 ---
 apiVersion: v1
@@ -35,6 +37,6 @@ spec:
     app: image
   ports:
     - protocol: TCP
-      port: 8004
-      targetPort: 8004
+      port: 80
+      targetPort: 80
 
