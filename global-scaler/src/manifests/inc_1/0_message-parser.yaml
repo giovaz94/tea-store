@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  generateName: sys-pod-message-parser-
+  labels:
+    app: parser
+spec:
+  #nodeName:  testing-cluster-pool-b7x6c
+  containers:
+  - name: parser
+    image: giovaz94/parser-service
+    env:
+      - name: REDIS_HOST
+        value: "redis-service"
+      - name: MCL
+        value: "110"
+      - name: LIMIT
+        value: "800"
+      - name: DELAY
+        value: "750"
+      - name: BATCH
+        value: "110"

@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  generateName: sys-pod-image-analyzer-
+  labels:
+    app: image-analyzer
+spec:
+  #nodeName: testing-cluster-pool-b7x6u
+  containers:
+  - name: image-analyzer
+    image: giovaz94/image-analyzer-service
+    env:
+      - name: REDIS_HOST
+        value: "redis-service"
+      - name: MCL
+        value: "231"
+      - name: LIMIT
+        value: "800"
+      - name: DELAY
+        value: "750"
+      - name: BATCH
+        value: "231"
+  

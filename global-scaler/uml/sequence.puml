@@ -1,0 +1,36 @@
+@startuml
+control "Guard" as G
+participant "Pipeline Monitor" as M 
+control "SysScaler" as S
+participant "Configurator" as C
+
+loop every x seconds
+    activate G
+    activate S
+    autonumber 1.0
+    G -> M: make http request for inbound workload
+    M --> G: return inbound workload
+    G -> S: request current MCL
+    activate S
+    S --> G: return current MCL
+    deactivate S
+    G -> G : check if scaling condition met
+    alt scaling or downscaling condition met
+        G -> S: send scaling request, with inbound workload
+        S -> C: request a configuration for a target MCL
+        activate C
+        C -> C: Calculate a new configuration
+        C --> S: return the configuration
+        deactivate C
+        activate S
+        S -> S: apply the configuration
+        S --> G: return feedback on the scaling request
+        deactivate S
+    end
+end
+
+
+ 
+
+
+@enduml

@@ -1,0 +1,11 @@
+pytest
+pykka
+gevent
+autopep8
+prometheus-api-client
+prometheus_client
+numpy
+kubernetes
+requests
+retry
+pyyaml

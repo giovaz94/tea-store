@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  generateName: sys-pod-virus-scanner-
+  labels:
+    app: virus-scanner
+spec:
+  #nodeName: testing-cluster-pool-b7x6c
+  containers:
+  - name: virus-scanner
+    image: giovaz94/virus-scanner-service
+    env:
+      - name: MCL
+        value: "120"
+      - name: REDIS_HOST
+        value: "redis-service"
+      - name: LIMIT
+        value: "800"
+      - name: DELAY
+        value: "750"
+      - name: BATCH
+        value: "120"
+
+   
+    

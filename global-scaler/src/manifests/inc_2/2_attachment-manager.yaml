@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  generateName: sys-pod-attachment-manager-
+  labels:
+    app: attachment-manager
+spec:
+  #nodeName: testing-cluster-pool-b7x6u
+  containers:
+  - name: attachment-manager
+    image: giovaz94/attachment-manager-service
+    env:
+      - name: MCL
+        value: "231"
+      - name: REDIS_HOST
+        value: "redis-service"
+      - name: LIMIT
+        value: "800"
+      - name: DELAY
+        value: "750"
+      - name: BATCH
+        value: "231"
+
