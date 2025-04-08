@@ -19,7 +19,7 @@ spec:
             - containerPort: 80
           env:
             - name: MCL
-              value: "190"
+              value: "905"
             - name: SERVICE_NAME
               value: "persistence"
             - name: PORT

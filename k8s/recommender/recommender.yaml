@@ -19,7 +19,7 @@ spec:
             - containerPort: 80
           env:
             - name: MCL
-              value: "190"
+              value: "2580"
             - name: SERVICE_NAME
               value: "recommender"
             - name: PORT
