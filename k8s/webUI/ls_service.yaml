@@ -1,0 +1,61 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ls-algorithm-attachment-manager
+spec:
+  selector:
+    matchLabels:
+      app: ls-algorithm-attachment-manager
+  template:
+    metadata:
+      labels:
+        app: ls-algorithm-attachment-manager
+    spec:
+      serviceAccountName: ls-service-account
+      containers:
+        - name: ls-algorithm
+          image: giovaz94/local_scaling
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 7001
+          env:
+            - name: SLEEP_TIME
+              value: "10"
+            - name: COMPONENT_MCL
+              value: "231"
+            - name: COMPONENT_MF
+              value: "1.5"
+            - name: K_BIG
+              value: "20"
+            - name: K
+              value: "10"
+            - name: IN_CLUSTER
+              value: "true"
+            - name: PROMETHEUS_SERVICE_ADDRESS
+              value: "prometheus-service.monitoring"
+            - name: PROMETHEUS_SERVICE_PORT
+              value: "8080"
+            - name: MANIFEST_NAME
+              value: "attachment-manager"
+            - name: METRIC_NAME
+              value: "http_requests_total_attachment_manager_counter"
+            - name: SERVICE_PORT
+              value: "7001"
+            - name: ORACLE
+              value: "true"
+            - name: PREDICTIONS
+              value: "457, 790, 1486, 3027, 5964, 8358, 10048, 8742, 7812, 6551, 5415, 4577, 4575, 4574, 3574, 2993, 1204, 1551, 2399, 219"
+            
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ls-algorithm-attachment-manager-service
+spec:
+  selector:
+    app: ls-algorithm-attachment-manager
+  ports:
+    - protocol: TCP
+      port: 7001
+      targetPort: 7001
