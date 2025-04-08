@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: image
-          image: giovaz94/image-service #change this
+          image: giovaz94/tea-store-general
           imagePullPolicy: Always
           ports:
             - containerPort: 8004
@@ -24,8 +24,6 @@ spec:
               value: "image"
             - name: PORT
               value: "8004"
-            - name: OUTPUT_SERVICES
-              value: '{"key1":"value1"}' #TODO change this
       restartPolicy: Always
 ---
 apiVersion: v1

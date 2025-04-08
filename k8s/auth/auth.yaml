@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: auth
-          image: giovaz94/auth-service #change this
+          image: giovaz94/tea-store-general #change this
           imagePullPolicy: Always
           ports:
             - containerPort: 8002
@@ -25,7 +25,7 @@ spec:
             - name: PORT
               value: "8002"
             - name: OUTPUT_SERVICES
-              value: '{"key1":"value1"}' #TODO change this
+              value: '{"persistence":"http://persistence-service:8003/request"}'
       restartPolicy: Always
 ---
 apiVersion: v1

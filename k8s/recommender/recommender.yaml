@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: recommender
-          recommender: giovaz94/recommender-service #change this
+          recommender: giovaz94/tea-store-general
           recommenderPullPolicy: Always
           ports:
             - containerPort: 8005
@@ -24,8 +24,6 @@ spec:
               value: "recommender"
             - name: PORT
               value: "8005"
-            - name: OUTPUT_SERVICES
-              value: '{"key1":"value1"}' #TODO change this
       restartPolicy: Always
 ---
 apiVersion: v1

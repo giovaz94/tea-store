@@ -13,8 +13,6 @@ const outputServices: Map<string, string> = new Map(
 );
 const serviceName: string = process.env.SERVICE_NAME || "undefinedService";
 
-// const serviceExec: number = parseInt(process.env.SERVICE_EXECUTION, 10) || Math.floor(Math.random() * 5) + 1; //you must specify for all services 1, for webUI do not specify anything
-
 if (process.env.MCL === undefined) {
   throw new Error("The MCL for the following service isn't defined");
 }
