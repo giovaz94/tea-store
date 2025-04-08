@@ -32,6 +32,9 @@ deploy_global() {
   
   echo -e "${GREEN}Deploying gs-algorithm...${NC}"
   kubectl apply -f "$K8S_DIR/gs-algorithm" && check_error
+
+  echo -e "${GREEN}Deploying persistence...${NC}"
+  kubectl apply -f "$K8S_DIR/image/image.yaml" && check_error
   
   echo -e "${GREEN}Deploying persistence...${NC}"
   kubectl apply -f "$K8S_DIR/persistence/persistence.yaml" && check_error
@@ -56,6 +59,9 @@ deploy_local() {
   
   echo -e "${GREEN}Deploying persistence...${NC}"
   kubectl apply -f "$K8S_DIR/persistence" && check_error
+
+  echo -e "${GREEN}Deploying persistence...${NC}"
+  kubectl apply -f "$K8S_DIR/image" && check_error
   
   echo -e "${GREEN}Deploying recommender...${NC}"
   kubectl apply -f "$K8S_DIR/recommender" && check_error
@@ -64,6 +70,27 @@ deploy_local() {
   kubectl apply -f "$K8S_DIR/webUI" && check_error
   
   echo -e "${GREEN}Deployment completed successfully!${NC}"
+}
+
+deploy_services_only() {
+  echo -e "${YELLOW}Executing SERVICES-ONLY deployment...${NC}"
+  
+  echo -e "${GREEN}Deploying auth...${NC}"
+  kubectl apply -f "$K8S_DIR/auth/auth.yaml" && check_error
+  
+  echo -e "${GREEN}Deploying persistence...${NC}"
+  kubectl apply -f "$K8S_DIR/persistence/persistence.yaml" && check_error
+  
+  echo -e "${GREEN}Deploying recommender...${NC}"
+  kubectl apply -f "$K8S_DIR/recommender/recommender.yaml" && check_error
+
+  echo -e "${GREEN}Deploying persistence...${NC}"
+  kubectl apply -f "$K8S_DIR/image/image.yaml" && check_error
+  
+  echo -e "${GREEN}Deploying webUI...${NC}"
+  kubectl apply -f "$K8S_DIR/webUI/webUI.yaml" && check_error
+  
+  echo -e "${GREEN}Services-only deployment completed successfully!${NC}"
 }
 
 undeploy_all() {
@@ -87,6 +114,10 @@ undeploy_all() {
   echo -e "${GREEN}Removing auth...${NC}"
   kubectl delete -f "$K8S_DIR/auth" --ignore-not-found=true
   kubectl delete -f "$K8S_DIR/auth/auth.yaml" --ignore-not-found=true
+
+  echo -e "${GREEN}Removing auth...${NC}"
+  kubectl delete -f "$K8S_DIR/image" --ignore-not-found=true
+  kubectl delete -f "$K8S_DIR/image/image.yaml" --ignore-not-found=true
   
   echo -e "${GREEN}Removing prometheus...${NC}"
   kubectl delete -f "$K8S_DIR/prometheus" --ignore-not-found=true
@@ -98,7 +129,7 @@ main() {
   check_kubectl
   
   if [ $# -ne 1 ]; then
-    echo -e "${RED}Provide one argument: 'global', 'local', or 'undeploy'${NC}"
+    echo -e "${RED}Provide one argument: 'global', 'local', 'services', or 'undeploy'${NC}"
     echo "Example: $0 global"
     exit 1
   fi
@@ -110,11 +141,14 @@ main() {
     "local")
       deploy_local
       ;;
+    "services")
+      deploy_services_only
+      ;;
     "undeploy")
       undeploy_all
       ;;
     *)
-      echo -e "${RED}Invalid argument. Use 'global', 'local', or 'undeploy'${NC}"
+      echo -e "${RED}Invalid argument. Use 'global', 'local', 'services', or 'undeploy'${NC}"
       echo "Example: $0 global"
       exit 1
       ;;
