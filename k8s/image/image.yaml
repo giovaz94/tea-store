@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: image
+spec:
+  selector:
+    matchLabels:
+      app: image
+  template:
+    metadata:
+      labels:
+        app: image
+    spec:
+      containers:
+        - name: image
+          image: giovaz94/image-service #change this
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8004
+          env:
+            - name: MCL
+              value: "190"
+            - name: SERVICE_NAME
+              value: "image"
+            - name: PORT
+              value: "8004"
+            - name: OUTPUT_SERVICES
+              value: '{"key1":"value1"}' #TODO change this
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: image-service
+spec:
+  selector:
+    app: image
+  ports:
+    - protocol: TCP
+      port: 8004
+      targetPort: 8004
+

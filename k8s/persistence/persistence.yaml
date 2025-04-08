@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: persistence
+spec:
+  selector:
+    matchLabels:
+      app: persistence
+  template:
+    metadata:
+      labels:
+        app: persistence
+    spec:
+      containers:
+        - name: persistence
+          image: giovaz94/persistence-service #change this
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8003
+          env:
+            - name: MCL
+              value: "190"
+            - name: SERVICE_NAME
+              value: "persistence"
+            - name: PORT
+              value: "8003"
+            - name: OUTPUT_SERVICES
+              value: '{"key1":"value1"}' #TODO CHANGE THIS
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: persistence-service
+spec:
+  selector:
+    app: persistence
+  ports:
+    - protocol: TCP
+      port: 8003
+      targetPort: 8003
+

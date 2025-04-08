@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth
+spec:
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+        - name: auth
+          image: giovaz94/auth-service #change this
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8002
+          env:
+            - name: MCL
+              value: "190"
+            - name: SERVICE_NAME
+              value: "auth"
+            - name: PORT
+              value: "8002"
+            - name: OUTPUT_SERVICES
+              value: '{"key1":"value1"}' #TODO change this
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+spec:
+  selector:
+    app: auth
+  ports:
+    - protocol: TCP
+      port: 8002
+      targetPort: 8002
+

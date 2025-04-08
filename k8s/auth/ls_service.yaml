@@ -2,15 +2,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ls-algorithm-webUI
+  name: ls-algorithm-auth
 spec:
   selector:
     matchLabels:
-      app: ls-algorithm-webUI
+      app: ls-algorithm-auth
   template:
     metadata:
       labels:
-        app: ls-algorithm-webUI
+        app: ls-algorithm-auth
     spec:
       serviceAccountName: ls-service-account
       containers:
@@ -23,7 +23,7 @@ spec:
             - name: SLEEP_TIME
               value: "10"
             - name: COMPONENT_MCL
-              value: "150"
+              value: "190"
             - name: COMPONENT_MF
               value: "1"
             - name: K_BIG
@@ -37,21 +37,21 @@ spec:
             - name: PROMETHEUS_SERVICE_PORT
               value: "8080"
             - name: MANIFEST_NAME
-              value: "webUI"
+              value: "auth"
             - name: METRIC_NAME
               value: "http_requests_total_attachment_manager_counter" #TODO CHANGE THIS
             - name: SERVICE_PORT
-              value: "7000"
+              value: "7001"
             
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: ls-algorithm-webUI-service
+  name: ls-algorithm-auth-service
 spec:
   selector:
-    app: ls-algorithm-webUI
+    app: ls-algorithm-auth
   ports:
     - protocol: TCP
-      port: 7000
-      targetPort: 7000
+      port: 7001
+      targetPort: 7001

@@ -2,15 +2,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ls-algorithm-webUI
+  name: ls-algorithm-persistence
 spec:
   selector:
     matchLabels:
-      app: ls-algorithm-webUI
+      app: ls-algorithm-persistence
   template:
     metadata:
       labels:
-        app: ls-algorithm-webUI
+        app: ls-algorithm-persistence
     spec:
       serviceAccountName: ls-service-account
       containers:
@@ -18,14 +18,14 @@ spec:
           image: giovaz94/local_scaling
           imagePullPolicy: Always
           ports:
-            - containerPort: 7001
+            - containerPort: 7002
           env:
             - name: SLEEP_TIME
               value: "10"
             - name: COMPONENT_MCL
-              value: "150"
+              value: "905"
             - name: COMPONENT_MF
-              value: "1"
+              value: "4"
             - name: K_BIG
               value: "10"
             - name: K
@@ -37,21 +37,21 @@ spec:
             - name: PROMETHEUS_SERVICE_PORT
               value: "8080"
             - name: MANIFEST_NAME
-              value: "webUI"
+              value: "persistence"
             - name: METRIC_NAME
               value: "http_requests_total_attachment_manager_counter" #TODO CHANGE THIS
             - name: SERVICE_PORT
-              value: "7000"
+              value: "7002" 
             
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: ls-algorithm-webUI-service
+  name: ls-algorithm-persistence-service
 spec:
   selector:
-    app: ls-algorithm-webUI
+    app: ls-algorithm-persistence
   ports:
     - protocol: TCP
-      port: 7000
-      targetPort: 7000
+      port: 7002
+      targetPort: 7002
