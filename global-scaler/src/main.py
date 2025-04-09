@@ -7,20 +7,7 @@ from components.mixer import Mixer
 
 
 if __name__ == '__main__':
-    """             
-        Current system given to the configurator:
-
-        IDX | Service name  | MCL | MF
-        ------------------------------ 
-        0   Message Parser   110    1
-        1   Virus Scanner    120    2
-        2   Attachment Man   231    1.5
-        3   Image Analyzer   231    1.5
-        4   Image Rec         90    1.5
-        5   NSFW Detector     90    1.5
-        6   Message Analyz   300    2
-        """
-
+    
     # Base configuration
     base = np.array([1, 1, 1, 1, 1])
 
