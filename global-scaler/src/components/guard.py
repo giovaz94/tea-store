@@ -89,11 +89,11 @@ class Guard:
         while self.running:
             start = time.time()
         
-            tot = self._execute_prometheus_query("sum(http_requests_total_parser)")
-            completed = self._execute_prometheus_query("sum(increase(http_requests_total_global[10s]))")
-            latency = self._execute_prometheus_query("sum(increase(http_requests_total_time[10s]))")
+            tot = self._execute_prometheus_query("sum(http_requests_total_webUI_counter)")
+            completed = self._execute_prometheus_query("sum(increase(behaviour_execution[10s]))")
+            latency = self._execute_prometheus_query("sum(increase(behaviour_time_execution[10s]))")
             avg_lat = latency/(completed if completed > 0 else 1)
-            loss = self._execute_prometheus_query("sum(increase(message_loss[10s]))")
+            loss = self._execute_prometheus_query("sum(increase(message_lost[10s]))")
             toPrint = str(iter) + " " + str(avg_lat)
               
 

@@ -20,12 +20,8 @@ const mcl: number = parseInt(process.env.MCL as string, 10);
 
 const lostMessage = createLostMessageCounter();
 const incomingMessages = createIncomingMessageCounter(serviceName);
-let behaviourCounter: Counter<string>;
-let behaviourTimeCounter: Counter<string>;
-if (serviceName === "webUI") {
-  behaviourCounter = createBehaviourCounter();
-  behaviourTimeCounter = createBehaviourTimeCounter();
-}
+let behaviourCounter: Counter<string> = createBehaviourCounter();
+let behaviourTimeCounter: Counter<string> = createBehaviourTimeCounter();
 
 export const handleRequest: RequestHandler = async (_, res) => {
   let executions = 1;
