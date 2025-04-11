@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: persistence
+spec:
+  selector:
+    matchLabels:
+      app: persistence
+  template:
+    metadata:
+      labels:
+        app: persistence
+    spec:
+      containers:
+        - name: persistence
+          image: giovaz94/tea-store-general
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          env:
+            - name: MCL
+              value: "905"
+            - name: SERVICE_NAME
+              value: "persistence"
+            - name: PORT
+              value: "80"
+            - name: OUTPUT_SERVICES
+              value: '{}'
+      restartPolicy: Always
+      

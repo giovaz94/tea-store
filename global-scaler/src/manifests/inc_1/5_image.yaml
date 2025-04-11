@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: image
+spec:
+  selector:
+    matchLabels:
+      app: image
+  template:
+    metadata:
+      labels:
+        app: image
+    spec:
+      containers:
+        - name: image
+          image: giovaz94/tea-store-general
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          env:
+            - name: MCL
+              value: "600"
+            - name: SERVICE_NAME
+              value: "image"
+            - name: PORT
+              value: "80"
+            - name: OUTPUT_SERVICES
+              value: '{}'
+      restartPolicy: Always
