@@ -1,12 +1,13 @@
 import express, {Request, Response , Application } from 'express';
 import axios from "axios";
+import * as prometheus from 'prom-client';
 
 const app: Application = express();
 const port: string | 8010 = process.env.PORT || 8010;
 const url: string = process.env.ENDPOINT || "localhost";
 
 const loss = new prometheus.Counter({
-    name: 'message_loss',
+    name: 'message_lost',
     help: 'Message Loss',
 });
 //enron standard
@@ -70,7 +71,14 @@ app.post('/start', (req: Request, res: Response) => {
             const r = workload[index++];
             console.log(`Sending ${r} requests per second`);
             for (let i = 0; i < r; i++) {
-                axios.post(url);
+                try {
+                    axios.post(url);
+                } catch (error: unknown) {
+                    const errorMessage = error instanceof Error ? error.message : "Unknown Error";
+                    console.error(`Error sending request to ${url}: ${errorMessage}`);
+                    loss.inc();
+                }
+                
             }
             await new Promise(resolve => setTimeout(resolve, 1000));
         }

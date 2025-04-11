@@ -14,27 +14,17 @@ spec:
       labels:
         app: entrypoint
     spec:
-      terminationGracePeriodSeconds: 60
       containers:
         - name: entrypoint
-          image: giovaz94/entrypoint
+          image: giovaz94/tea-store-ep
           imagePullPolicy: Always
           ports:
-            - containerPort: 8010
+            - containerPort: 80
           env:
             - name: PORT
-              value: "8010"
-            - name: REFRESH_TIME
-              value: "300000"
-            - name: LS_ENABLED
-              value: "true"
-            - name: REDIS_HOST
-              value: "redis-service"
-            - name: LIMIT
-              value: "8000"
-          resources:
-            requests:
-              cpu: 100m
+              value: "80"
+            - name: ENDPOINT
+              value: "http://webui-service/request"
       restartPolicy: Always
 ---
 apiVersion: v1
@@ -45,10 +35,8 @@ metadata:
   name: entrypoint-service
 spec:
   ports:
-    - port: 8010
-      targetPort: 8010
+    - port: 80
+      targetPort: 80
       protocol: TCP
-      nodePort: 30080
   selector:
     app: entrypoint
-  type: NodePort
