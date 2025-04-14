@@ -56,7 +56,9 @@ if (serviceName === "webUI") {
 }
 
 export const handleRequest: RequestHandler = async (_, res) => {
-  queue.enqueue(res);
+  let startTime = Date.now();
+  queue.enqueue(startTime);
+  res.status(200).send("OK");
 };
   // let executions = 1;
   // let startTime = 0;
@@ -93,13 +95,11 @@ export const handleRequest: RequestHandler = async (_, res) => {
 
 export async function processQueue() {
   while (true) {
-    const item = await queue.dequeue();
+    const startTime = await queue.dequeue();
     // console.log("Processed:", item);
     let executions = 1;
-    let startTime = 0;
     if (serviceName === "webUI") {
       executions = Math.floor(Math.random() * 5) + 1;
-      startTime = Date.now();
     }
     incomingMessages.inc();
     let sleepTime = calculateSleepTime(mcl);
@@ -125,6 +125,5 @@ export async function processQueue() {
       behaviourCounter.inc();
       behaviourTimeCounter.inc(Date.now() - startTime);
     }
-    item.status(200).send("OK");
   }
 }
