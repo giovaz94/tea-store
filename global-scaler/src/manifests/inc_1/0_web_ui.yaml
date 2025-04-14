@@ -19,5 +19,5 @@ spec:
         - name: PORT
           value: "80"
         - name: OUTPUT_SERVICES
-              value: '{"http://auth-service/request":"1","http://persistence-service/request":"1", "http://recommender-service/request":"1", "http://image-service/request":"2"}'
+          value: '{"http://auth-service/request":"1","http://persistence-service/request":"1", "http://recommender-service/request":"1", "http://image-service/request":"2"}'
   restartPolicy: Always
