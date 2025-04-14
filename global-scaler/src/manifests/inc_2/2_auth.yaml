@@ -1,29 +1,23 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Pod
 metadata:
-  name: auth
+  generateName: sys-pod-auth-
+  labels:
+    app: auth
 spec:
-  selector:
-    matchLabels:
-      app: auth
-  template:
-    metadata:
-      labels:
-        app: auth
-    spec:
-      containers:
-        - name: auth
-          image: giovaz94/tea-store-general 
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 80
-          env:
-            - name: MCL
-              value: "190"
-            - name: SERVICE_NAME
-              value: "auth"
-            - name: PORT
-              value: "80"
-            - name: OUTPUT_SERVICES
-              value: '{"http://persistence-service/request":"1"}'
-      restartPolicy: Always
+  containers:
+    - name: auth
+      image: giovaz94/tea-store-general 
+      imagePullPolicy: Always
+      ports:
+        - containerPort: 80
+      env:
+        - name: MCL
+          value: "190"
+        - name: SERVICE_NAME
+          value: "auth"
+        - name: PORT
+          value: "80"
+        - name: OUTPUT_SERVICES
+          value: '{"http://persistence-service/request":"1"}'
+  restartPolicy: Always

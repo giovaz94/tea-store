@@ -1,30 +1,23 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Pod
 metadata:
-  name: webui
+  generateName: sys-pod-webui-
+  labels:
+    app: webui
 spec:
-  selector:
-    matchLabels:
-      app: webui
-  template:
-    metadata:
-      labels:
-        app: webui
-    spec:
-      containers:
-        - name: webui
-          image: giovaz94/tea-store-general 
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 80
-          env:
-            - name: MCL
-              value: "150"
-            - name: SERVICE_NAME
-              value: "webUI"
-            - name: PORT
-              value: "80"
-            - name: OUTPUT_SERVICES
-              value: '{"http://persistence-service/request":"1", "http://recommender-service/request":"1", "http://image-service/request":"2"}'
-      restartPolicy: Always
-      
+  containers:
+    - name: webui
+      image: giovaz94/tea-store-general 
+      imagePullPolicy: Always
+      ports:
+        - containerPort: 80
+      env:
+        - name: MCL
+          value: "150"
+        - name: SERVICE_NAME
+          value: "webUI"
+        - name: PORT
+          value: "80"
+        - name: OUTPUT_SERVICES
+          value: '{"http://persistence-service/request":"1", "http://recommender-service/request":"1", "http://image-service/request":"2"}'
+  restartPolicy: Always
