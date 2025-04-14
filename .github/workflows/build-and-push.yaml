@@ -12,7 +12,7 @@ jobs:
       matrix:
         include:
           - dockerfile: ./entrypoint/Dockerfile
-            context: ./parser
+            context: ./entrypoint
             image: giovaz94/tea-store-ep
           - dockerfile: ./global-scaler/Dockerfile
             context: ./global-scaler
