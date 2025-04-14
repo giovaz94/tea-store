@@ -13,7 +13,7 @@ if __name__ == '__main__':
 
     # Microservices MCL and MF
     microservices_mcl = np.array([150, 905, 190, 2580, 600]) #
-    microservices_mf = np.array([1, 2, 1, 1, 2])   
+    microservices_mf = np.array([1, 4, 1, 3, 6])   
 
     # Replicas for each increment
     scale_config = np.array([
