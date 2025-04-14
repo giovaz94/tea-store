@@ -1,7 +1,7 @@
 import express from "express";
 import cluster from "cluster";
 import { cpus } from "os";
-import { handleRequest } from "#middleware/middleware.js";
+import { handleRequest, processQueue } from "#middleware/middleware.js";
 import { prometheusMetrics } from "#middleware/prometheus.js";
 
 const numCPUs = cpus().length;
@@ -24,6 +24,7 @@ if (cluster.isPrimary) {
 
   app.get("/metrics", prometheusMetrics);
   app.post("/request", handleRequest);
+  processQueue();
 
   const server = app.listen(port, () => {
     server.keepAliveTimeout = 65000;

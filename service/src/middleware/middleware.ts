@@ -8,10 +8,38 @@ import {
 import { createBehaviourCounter, createBehaviourTimeCounter } from "../utils/prometheus";
 import { Counter } from "prom-client";
 
+
+//////BLOCKING QUEUE///////
+class BlockingQueue<T> {
+  private queue: T[] = [];
+  private resolvers: ((value: T) => void)[] = [];
+
+  enqueue(item: T) {
+    if (this.resolvers.length > 0) {
+      const resolve = this.resolvers.shift()!;
+      resolve(item);
+    } else {
+      this.queue.push(item);
+    }
+  }
+
+  async dequeue(): Promise<T> {
+    if (this.queue.length > 0) {
+      return this.queue.shift()!;
+    }
+
+    return new Promise<T>(resolve => {
+      this.resolvers.push(resolve);
+    });
+  }
+}
+/////////
+
 const outputServices: Map<string, string> = new Map(
   Object.entries(JSON.parse(process.env.OUTPUT_SERVICES || "{}")),
 );
 const serviceName: string = process.env.SERVICE_NAME || "undefinedService";
+const queue = new BlockingQueue<any>();
 
 if (process.env.MCL === undefined) {
   throw new Error("The MCL for the following service isn't defined");
@@ -20,39 +48,83 @@ const mcl: number = parseInt(process.env.MCL as string, 10);
 
 const lostMessage = createLostMessageCounter();
 const incomingMessages = createIncomingMessageCounter(serviceName);
-let behaviourCounter: Counter<string> = createBehaviourCounter();
-let behaviourTimeCounter: Counter<string> = createBehaviourTimeCounter();
+let behaviourCounter: Counter<string>;
+let behaviourTimeCounter: Counter<string>;
+if (serviceName === "webUI") {
+  behaviourCounter = createBehaviourCounter();
+  behaviourTimeCounter = createBehaviourTimeCounter();
+}
 
 export const handleRequest: RequestHandler = async (_, res) => {
-  let executions = 1;
-  let startTime = 0;
-  if (serviceName === "webUI") {
-    executions = Math.floor(Math.random() * 5) + 1;
-    startTime = Date.now();
-  }
-  incomingMessages.inc();
-  let sleepTime = calculateSleepTime(mcl);
-  console.log(outputServices.entries());
-  await sleep(sleepTime);
-  while (executions > 0) {
-    for (const [url, numberOfRequests] of outputServices.entries()) {
-      const n = parseInt(numberOfRequests, 10);
-      console.log(`Sending ${n} requests to ${url}`);
-      for (let i = 0; i < n; i++) {
-        try {
-          await axios.post(url);
-        } catch (error: unknown) {
-          const errorMessage = error instanceof Error ? error.message : "Unknown Error";
-          console.error(`Error sending request to ${url}: ${errorMessage}`);
-          lostMessage.inc();
+  queue.enqueue(res);
+};
+  // let executions = 1;
+  // let startTime = 0;
+  // if (serviceName === "webUI") {
+  //   executions = Math.floor(Math.random() * 5) + 1;
+  //   startTime = Date.now();
+  // }
+  // incomingMessages.inc();
+  // let sleepTime = calculateSleepTime(mcl);
+  // console.log(outputServices.entries());
+  // await sleep(sleepTime);
+  // while (executions > 0) {
+  //   for (const [url, numberOfRequests] of outputServices.entries()) {
+  //     const n = parseInt(numberOfRequests, 10);
+  //     console.log(`Sending ${n} requests to ${url}`);
+  //     for (let i = 0; i < n; i++) {
+  //       try {
+  //         await axios.post(url);
+  //       } catch (error: unknown) {
+  //         const errorMessage = error instanceof Error ? error.message : "Unknown Error";
+  //         console.error(`Error sending request to ${url}: ${errorMessage}`);
+  //         lostMessage.inc();
+  //       }
+  //     }
+  //   }
+  //   executions--;
+  // }
+  // if (serviceName === "webUI") {
+  //   behaviourCounter.inc();
+  //   behaviourTimeCounter.inc(Date.now() - startTime);
+  // }
+  // res.status(200).send("OK");
+// };
+
+export async function processQueue() {
+  while (true) {
+    const item = await queue.dequeue();
+    console.log("Processed:", item);
+    let executions = 1;
+    let startTime = 0;
+    if (serviceName === "webUI") {
+      executions = Math.floor(Math.random() * 5) + 1;
+      startTime = Date.now();
+    }
+    incomingMessages.inc();
+    let sleepTime = calculateSleepTime(mcl);
+    console.log(outputServices.entries());
+    await sleep(sleepTime);
+    while (executions > 0) {
+      for (const [url, numberOfRequests] of outputServices.entries()) {
+        const n = parseInt(numberOfRequests, 10);
+        console.log(`Sending ${n} requests to ${url}`);
+        for (let i = 0; i < n; i++) {
+          try {
+            await axios.post(url);
+          } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : "Unknown Error";
+            console.error(`Error sending request to ${url}: ${errorMessage}`);
+            lostMessage.inc();
+          }
         }
       }
+      executions--;
     }
-    executions--;
+    if (serviceName === "webUI") {
+      behaviourCounter.inc();
+      behaviourTimeCounter.inc(Date.now() - startTime);
+    }
+    item.status(200).send("OK");
   }
-  if (serviceName === "webUI") {
-    behaviourCounter.inc();
-    behaviourTimeCounter.inc(Date.now() - startTime);
-  }
-  res.status(200).send("OK");
-};
+}
