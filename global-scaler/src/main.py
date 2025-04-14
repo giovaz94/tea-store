@@ -9,7 +9,7 @@ from components.mixer import Mixer
 if __name__ == '__main__':
     
     # Base configuration
-    base = np.array([1, 1, 1, 1, 2]) # WebUI, Persistence, Auth, Recommender, Image
+    base = np.array([1, 1, 1, 1, 2]) # webui, Persistence, Auth, Recommender, Image
 
     # Microservices MCL and MF
     microservices_mcl = np.array([150, 905, 190, 2580, 600]) #

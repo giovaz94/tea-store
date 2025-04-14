@@ -15,9 +15,9 @@ spec:
         - name: MCL
           value: "150"
         - name: SERVICE_NAME
-          value: "webUI"
+          value: "webui"
         - name: PORT
           value: "80"
         - name: OUTPUT_SERVICES
-          value: '{"http://persistence-service/request":"1", "http://recommender-service/request":"1", "http://image-service/request":"2"}'
+              value: '{"http://auth-service/request":"1","http://persistence-service/request":"1", "http://recommender-service/request":"1", "http://image-service/request":"2"}'
   restartPolicy: Always
