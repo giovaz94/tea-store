@@ -92,7 +92,7 @@ describe("Prometheus Utils", async () => {
 
   describe("createLostMessageCounter", () => {
     it("should create a counter for lost messages", () => {
-      const counter = createLostMessageCounter();
+      const counter = createLostMessageCounter("api-service");
 
       expect(Counter).toHaveBeenCalledWith({
         name: "message_lost",

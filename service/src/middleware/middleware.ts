@@ -94,7 +94,7 @@ export const handleRequest: RequestHandler = async (_, res) => {
 export async function processQueue() {
   while (true) {
     const item = await queue.dequeue();
-    console.log("Processed:", item);
+    // console.log("Processed:", item);
     let executions = 1;
     let startTime = 0;
     if (serviceName === "webUI") {

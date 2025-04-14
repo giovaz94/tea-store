@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: webui
-          image: giovaz94/tea-store-general
+          image: giovaz94/tea-store-general 
           imagePullPolicy: Always
           ports:
             - containerPort: 80
@@ -43,6 +43,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: webui-service
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "80"
+    prometheus.io/path: "/metrics"   # optional, defaults to /metrics
 spec:
   type: NodePort
   selector:
