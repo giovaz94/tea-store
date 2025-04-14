@@ -44,7 +44,7 @@ spec:
       serviceAccountName: gs-service-account
       containers:
         - name: gs-algorithm
-          image: giovaz94/gs-implmentation:latest
+          image: giovaz94/tea-store-gs
           imagePullPolicy: Always
           ports:
             - containerPort: 5000
@@ -64,10 +64,9 @@ spec:
             - name: PROACTIVE_REACTIVE
               value: "false"
             - name: PROMETHEUS_SERVICE_ADDRESS
-              value: "prometheus-service.monitoring"
+              value: "prometheus-service.monitoring.svc.cluster.local"
             - name: PROMETHEUS_SERVICE_PORT
-              value: "9090"
-
+              value: "8080"
       restartPolicy: Always
 ---
 apiVersion: v1
