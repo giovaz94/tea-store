@@ -80,7 +80,6 @@ class Guard:
         current_mcl = self.scaler.get_mcl()
         pred_workload = 0
         config = self.scaler.get_current_config()
-        started = False
 
         if self.proactiveness:
             pred_workload = sum(self.predictions[iter-self.sleep:])/self.sleep
@@ -96,7 +95,8 @@ class Guard:
             avg_lat = latency/(completed if completed > 0 else 1)
             loss = self._execute_prometheus_query("sum(increase(message_lost[10s]))")
             toPrint = str(iter) + " " + str(avg_lat)
-            started = started or tot > 0
+              
+
             #reactivity
             measured_workload = (tot-init_val)/self.sleep
             target_workload = measured_workload
@@ -122,13 +122,12 @@ class Guard:
                 target_conf = self.scaler.calculate_configuration(target_workload + self.k_big)
                 current_mcl, _ = self.scaler.process_request(target_conf)    
 
-            # if tot - init_val > 0:
-            #     init_val = tot if iter > 0 else init_val
-            #     sl = self.sleep if iter > 0 else self.sleep - sl
-            #     iter += self.sleep
-            #     stop = time.time()
-            #     time_difference = stop - start
-            #     sl -= time_difference
-            if started:
+            if tot - init_val > 0:
+                init_val = tot if iter > 0 else init_val
+                sl = self.sleep if iter > 0 else self.sleep - sl
                 iter += self.sleep
-            time.sleep(self.sleep)
+                stop = time.time()
+                time_difference = stop - start
+                sl -= time_difference
+
+            time.sleep(sl)
