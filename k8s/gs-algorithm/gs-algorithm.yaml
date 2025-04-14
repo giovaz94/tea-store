@@ -60,7 +60,7 @@ spec:
             - name: ERROR_LIMIT
               value: "3"
             - name: PROACTIVE
-              value: "true"
+              value: "false"
             - name: PROACTIVE_REACTIVE
               value: "false"
             - name: PROMETHEUS_SERVICE_ADDRESS
