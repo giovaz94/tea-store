@@ -30,8 +30,8 @@ class Guard:
         self.scaler = scaler
         self.mixer = mixer
 
-        prometheus_service_address = os.environ.get("PROMETHEUS_SERVICE_ADDRESS", "localhost")
-        prometheus_service_port = os.environ.get("PROMETHEUS_SERVICE_PORT", "53216")
+        prometheus_service_address = os.environ.get("PROMETHEUS_SERVICE_ADDRESS", "192.168.0.139")
+        prometheus_service_port = os.environ.get("PROMETHEUS_SERVICE_PORT", "30000")
         prometheus_url = f"http://{prometheus_service_address}:{prometheus_service_port}"
         self.prometheus_instance = PrometheusConnect(url=prometheus_url)
 
@@ -115,7 +115,7 @@ class Guard:
                 target_workload = self.mixer.mix(measured_workload, pred_workload, last_pred_conf, measured_conf)
                 last_pred_conf = self.scaler.calculate_configuration(pred_workload + self.k_big)
             if self.proactive_reactive: toPrint += " mixed: " + str(target_workload)
-            toPrint += " tot: " + str(measured_workload * self.sleep) + " comp: " + str(completed) + " rej: " + str(loss) + " supp: " + str(current_mcl) + " inst: " + str(3+np.sum(config))
+            toPrint += " tot: " + str(measured_workload * self.sleep) + " comp: " + str(completed) + " rej: " + str(loss) + " supp: " + str(current_mcl) + " inst: " + str(np.sum(config))
             print(toPrint, flush=True)
 
 

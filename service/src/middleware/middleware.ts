@@ -57,6 +57,7 @@ if (serviceName === "webUI") {
 
 export const handleRequest: RequestHandler = async (_, res) => {
   let startTime = Date.now();
+  incomingMessages.inc();
   queue.enqueue(startTime);
   res.status(200).send("OK");
 };
@@ -101,7 +102,6 @@ export async function processQueue() {
     if (serviceName === "webUI") {
       executions = Math.floor(Math.random() * 5) + 1;
     }
-    incomingMessages.inc();
     let sleepTime = calculateSleepTime(mcl);
     console.log(outputServices.entries());
     await sleep(sleepTime);

@@ -34,6 +34,7 @@ metadata:
     app: entrypoint
   name: entrypoint-service
 spec:
+  type: NodePort
   ports:
     - port: 80
       targetPort: 80
