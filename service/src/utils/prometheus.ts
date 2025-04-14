@@ -34,9 +34,9 @@ export function createIncomingMessageCounter(
   );
 }
 
-export function createLostMessageCounter(): Counter<string> {
+export function createLostMessageCounter(serviceName: string): Counter<string> {
   return createCounter(
-    "message_lost",
+    `message_lost_${serviceName}`,
     "Total number of messages that failed to be delivered",
     ["service", "reason"],
   );

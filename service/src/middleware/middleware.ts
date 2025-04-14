@@ -46,7 +46,7 @@ if (process.env.MCL === undefined) {
 }
 const mcl: number = parseInt(process.env.MCL as string, 10);
 
-const lostMessage = createLostMessageCounter();
+const lostMessage = createLostMessageCounter(serviceName);
 const incomingMessages = createIncomingMessageCounter(serviceName);
 let behaviourCounter: Counter<string>;
 let behaviourTimeCounter: Counter<string>;
