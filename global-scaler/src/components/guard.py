@@ -96,7 +96,7 @@ class Guard:
               
 
             #reactivity
-            measured_workload = (tot-init_val)/self.sleep
+            measured_workload = tot/self.sleep#(tot-init_val)/self.sleep
             target_workload = measured_workload
             
             #proactivity
