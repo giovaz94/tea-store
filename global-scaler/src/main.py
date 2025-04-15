@@ -17,7 +17,7 @@ if __name__ == '__main__':
 
     # Replicas for each increment
     scale_config = np.array([
-        [1, 2, 1, 0, 2],  # Increment 1
+        [2, 1, 1, 0, 2],  # Increment 1
         [1, 1, 1, 0, 2],  # Increment 2
     ])
 
@@ -90,8 +90,8 @@ if __name__ == '__main__':
 
     
     scores = [60/330, 90/330, 90/330, 90/330]
-    k_big = int(os.environ.get("K_BIG", "20"))
-    k = int(os.environ.get("K", "10"))
+    k_big = int(os.environ.get("K_BIG", "10"))
+    k = int(os.environ.get("K", "8"))
     sleep = int(os.environ.get("SLEEP", "10")) #it will be automatically adjusted to 10s as soon the simulation starts 
     error_limit = int(os.environ.get("ERROR_LIMIT", "3"))
     mixer = Mixer(error_limit, scores)
