@@ -15,7 +15,7 @@ spec:
         - name: MCL
           value: "150"
         - name: SERVICE_NAME
-          value: "webUI
+          value: "webUI"
         - name: PORT
           value: "80"
         - name: OUTPUT_SERVICES
