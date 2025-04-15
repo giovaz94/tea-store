@@ -86,10 +86,8 @@ class Guard:
             last_pred_conf = self.scaler.calculate_configuration(pred_workload + self.k_big)
             current_mcl, _ = self.scaler.process_request(last_pred_conf)
 
-        while self.running:
-            start = time.time()
-        
-            tot = self._execute_prometheus_query("sum(http_requests_total_webUI_counter)")
+        while self.running:        
+            tot = self._execute_prometheus_query("sum(increase(http_requests_total_webUI_counter[10s]))")
             completed = self._execute_prometheus_query("sum(increase(behaviour_execution[10s]))")
             latency = self._execute_prometheus_query("sum(increase(behaviour_time_execution[10s]))")
             avg_lat = latency/(completed if completed > 0 else 1)
@@ -122,12 +120,12 @@ class Guard:
                 target_conf = self.scaler.calculate_configuration(target_workload + self.k_big)
                 current_mcl, _ = self.scaler.process_request(target_conf)    
 
-            if tot - init_val > 0:
-                init_val = tot if iter > 0 else init_val
-                sl = self.sleep if iter > 0 else self.sleep - sl
-                iter += self.sleep
-                stop = time.time()
-                time_difference = stop - start
-                sl -= time_difference
+            # if tot - init_val > 0:
+            #     init_val = tot if iter > 0 else init_val
+            #     sl = self.sleep if iter > 0 else self.sleep - sl
+            #     iter += self.sleep
+            #     stop = time.time()
+            #     time_difference = stop - start
+            #     sl -= time_difference
 
-            time.sleep(sl)
+            time.sleep(self.sleep)
