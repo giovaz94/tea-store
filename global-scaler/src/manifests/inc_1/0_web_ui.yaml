@@ -16,6 +16,8 @@ spec:
           value: "150"
         - name: SERVICE_NAME
           value: "webUI"
+        - name: MAX_SIZE
+          value: "100"
         - name: PORT
           value: "80"
         - name: OUTPUT_SERVICES

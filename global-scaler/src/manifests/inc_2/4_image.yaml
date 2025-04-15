@@ -18,6 +18,8 @@ spec:
           value: "image"
         - name: PORT
           value: "80"
+        - name: MAX_SIZE
+          value: "100"
         - name: OUTPUT_SERVICES
           value: '{}'
   restartPolicy: Always

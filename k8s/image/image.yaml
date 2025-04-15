@@ -23,6 +23,8 @@ spec:
               value: "600"
             - name: SERVICE_NAME
               value: "image"
+            - name: MAX_SIZE
+              value: "100"
             - name: PORT
               value: "80"
             - name: OUTPUT_SERVICES
