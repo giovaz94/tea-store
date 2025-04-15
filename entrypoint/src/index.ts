@@ -6,10 +6,6 @@ const app: Application = express();
 const port: string | 8010 = process.env.PORT || 8010;
 const url: string = process.env.ENDPOINT || "localhost";
 
-const loss = new prometheus.Counter({
-    name: 'message_lost',
-    help: 'Message Loss',
-});
 //enron standard
 const workload = [
     10, 5, 2, 2, 25, 22, 17, 20, 22, 27,
@@ -76,7 +72,6 @@ app.post('/start', (req: Request, res: Response) => {
                 } catch (error: unknown) {
                     const errorMessage = error instanceof Error ? error.message : "Unknown Error";
                     console.error(`Error sending request to ${url}: ${errorMessage}`);
-                    loss.inc();
                 }
                 
             }
