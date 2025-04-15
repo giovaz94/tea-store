@@ -7,19 +7,24 @@ import {
 } from "#utils/prometheus.js";
 import { createBehaviourCounter, createBehaviourTimeCounter } from "../utils/prometheus";
 import { Counter } from "prom-client";
+import { connect } from "http2";
 
 
 //////BLOCKING QUEUE///////
 class BlockingQueue<T> {
   private queue: T[] = [];
   private resolvers: ((value: T) => void)[] = [];
+  private maxSizeString: string = process.env.MAX_SIZE || "50";
+  private maxSize: number = parseInt(this.maxSizeString);
 
-  enqueue(item: T) {
+  enqueue(item: T): void {
     if (this.resolvers.length > 0) {
       const resolve = this.resolvers.shift()!;
       resolve(item);
-    } else {
+    } else if (this.queue.length < this.maxSize) {
       this.queue.push(item);
+    } else {
+      console.log("request rejected");
     }
   }
 
