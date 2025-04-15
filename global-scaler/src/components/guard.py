@@ -127,5 +127,5 @@ class Guard:
             #     stop = time.time()
             #     time_difference = stop - start
             #     sl -= time_difference
-
+            iter += self.sleep
             time.sleep(self.sleep)
