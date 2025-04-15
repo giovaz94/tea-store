@@ -17,14 +17,16 @@ class BlockingQueue<T> {
   private maxSizeString: string = process.env.MAX_SIZE || "50";
   private maxSize: number = parseInt(this.maxSizeString);
 
-  enqueue(item: T): void {
+  enqueue(item: T): boolean {
     if (this.resolvers.length > 0) {
       const resolve = this.resolvers.shift()!;
       resolve(item);
     } else if (this.queue.length < this.maxSize) {
       this.queue.push(item);
+      return true;
     } else {
       console.log("request rejected");
+      return false;
     }
   }
 
@@ -63,44 +65,18 @@ if (serviceName === "webUI") {
 export const handleRequest: RequestHandler = async (_, res) => {
   let startTime = Date.now();
   incomingMessages.inc();
-  queue.enqueue(startTime);
-  res.status(200).send("OK");
+  const enqueueSuccessful = queue.enqueue(startTime);
+  
+  if (enqueueSuccessful) {
+    res.status(200).send("OK");
+  } else {
+    res.status(500).send("Service Unavailable: Queue is full");
+  }
 };
-  // let executions = 1;
-  // let startTime = 0;
-  // if (serviceName === "webUI") {
-  //   executions = Math.floor(Math.random() * 5) + 1;
-  //   startTime = Date.now();
-  // }
-  // incomingMessages.inc();
-  // let sleepTime = calculateSleepTime(mcl);
-  // console.log(outputServices.entries());
-  // await sleep(sleepTime);
-  // while (executions > 0) {
-  //   for (const [url, numberOfRequests] of outputServices.entries()) {
-  //     const n = parseInt(numberOfRequests, 10);
-  //     console.log(`Sending ${n} requests to ${url}`);
-  //     for (let i = 0; i < n; i++) {
-  //       try {
-  //         await axios.post(url);
-  //       } catch (error: unknown) {
-  //         const errorMessage = error instanceof Error ? error.message : "Unknown Error";
-  //         console.error(`Error sending request to ${url}: ${errorMessage}`);
-  //         lostMessage.inc();
-  //       }
-  //     }
-  //   }
-  //   executions--;
-  // }
-  // if (serviceName === "webUI") {
-  //   behaviourCounter.inc();
-  //   behaviourTimeCounter.inc(Date.now() - startTime);
-  // }
-  // res.status(200).send("OK");
-// };
 
 export async function processQueue() {
   while (true) {
+    let lostMessageFlag = false;
     const startTime = await queue.dequeue();
     // console.log("Processed:", item);
     let executions = 1;
@@ -116,17 +92,22 @@ export async function processQueue() {
         console.log(`Sending ${n} requests to ${url}`);
         for (let i = 0; i < n; i++) {
           try {
-            await axios.post(url);
+            const response = await axios.post(url);
+            if (response.status === 500 && serviceName === "webUI") {
+              console.error(`Received 500 status from ${url}`);
+              lostMessage.inc();
+              lostMessageFlag = true;
+              break;
+            }
           } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : "Unknown Error";
             console.error(`Error sending request to ${url}: ${errorMessage}`);
-            lostMessage.inc();
           }
         }
       }
       executions--;
     }
-    if (serviceName === "webUI") {
+    if (serviceName === "webUI" && !lostMessageFlag) {
       behaviourCounter.inc();
       behaviourTimeCounter.inc(Date.now() - startTime);
     }
