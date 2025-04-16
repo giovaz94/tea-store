@@ -27,13 +27,13 @@ spec:
             - name: COMPONENT_MF
               value: "1"
             - name: K_BIG
-              value: "10"
+              value: "35"
             - name: K
-              value: "8"
+              value: "10"
             - name: IN_CLUSTER
               value: "true"
             - name: PROMETHEUS_SERVICE_ADDRESS
-              value: "prometheus-service.monitoring"
+              value: "prometheus-service.monitoring.svc.cluster.local"
             - name: PROMETHEUS_SERVICE_PORT
               value: "8080"
             - name: MANIFEST_NAME
