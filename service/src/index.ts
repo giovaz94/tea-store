@@ -44,8 +44,13 @@ const port = process.env.PORT ?? "9001";
 app.use(rateLimitMiddleware);
 app.get("/metrics", prometheusMetrics);
 app.post("/request", async (req: Request, res: Response) => {
+  const start = Date.now();
   await sleep(1000/mcl);
-  if (serviceName == "webUI") webuiTask();
+  if (serviceName == "webUI") {
+    await webuiTask();
+    const duration = Date.now() - start;
+    behaviourTimeCounter.inc(Date.now() - start);
+  }
   else if (serviceName == "auth") axios.post("http://persistence-service/request");
   console.log("Req parsed");
   res.sendStatus(200);
@@ -62,7 +67,6 @@ function sleep(ms: number) {
 }
 
 const webuiTask = async () => {
-  const start = Date.now();
   incomingMessages.inc();
   await axios.post("http://auth-service/request");
   let executions = Math.floor(Math.random() * 5) + 1;
@@ -83,7 +87,6 @@ const webuiTask = async () => {
     executions--;
   }
   behaviourCounter.inc();
-  behaviourTimeCounter.inc(Date.now() - start);
 };
 
 setInterval(() => {
