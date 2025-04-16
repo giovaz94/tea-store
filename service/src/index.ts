@@ -49,7 +49,7 @@ app.post("/request", async (req: Request, res: Response) => {
   if (serviceName == "webUI") {
     await webuiTask();
     const duration = Date.now() - start;
-    behaviourTimeCounter.inc(Date.now() - start);
+    behaviourTimeCounter.inc(duration);
   }
   else if (serviceName == "auth") axios.post("http://persistence-service/request");
   console.log("Req parsed");
