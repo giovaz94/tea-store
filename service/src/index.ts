@@ -8,6 +8,7 @@ type Task = {
   resolve: () => void;
   req: Request;
   res: Response;
+  arrivalTime: number;
   next: NextFunction;
 };
 
@@ -31,8 +32,9 @@ const outputServices: Map<string, string> = new Map(Object.entries(JSON.parse(pr
 const queue: Task[] = [];
 
 function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
+  const arrivalTime = Date.now(); 
   const ready = new Promise<void>((resolve) => {
-    queue.push({ resolve, req, res, next });
+    queue.push({ resolve, req, res, next, arrivalTime });
   });
   ready.then(() => {
     next();
@@ -45,10 +47,9 @@ app.use(rateLimitMiddleware);
 app.get("/metrics", prometheusMetrics);
 app.post("/request", async (req: Request, res: Response) => {
   try {
-    const start = Date.now();
     await sleep(1000/mcl);
     if (serviceName == "webUI") {
-      webuiTask(start);
+      webuiTask(req);
     }
     else if (serviceName == "auth") axios.post("http://persistence-service/request");
     console.log("Req parsed");
@@ -59,17 +60,13 @@ app.post("/request", async (req: Request, res: Response) => {
   }
 });
 
-const server = app.listen(port, () => {
-  server.keepAliveTimeout = 65000;
-  server.headersTimeout = 66000;
-  console.log(`${serviceName} started and listening on port ${port}`);
-});
-
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-const webuiTask = async (start: number) => {
+const webuiTask = async (req: Request) => {
+  const task: Task | null = queue.find(t => t.req === req) || null;
+  if (!task) return;
   incomingMessages.inc();
   await axios.post("http://auth-service/request");
   let executions = Math.floor(Math.random() * 5) + 1;
@@ -89,7 +86,8 @@ const webuiTask = async (start: number) => {
       }
     executions--;
   }
-  const duration = Date.now() - start;
+  const stop = Date.now();
+  const duration = stop - task.arrivalTime;
   behaviourCounter.inc();
   behaviourTimeCounter.inc(duration);
 };
@@ -100,3 +98,10 @@ setInterval(() => {
     task.resolve();
   }
 }, 1000 / mcl);
+
+
+const server = app.listen(port, () => {
+  server.keepAliveTimeout = 65000;
+  server.headersTimeout = 66000;
+  console.log(`${serviceName} started and listening on port ${port}`);
+});
