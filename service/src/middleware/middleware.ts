@@ -21,6 +21,7 @@ class BlockingQueue<T> {
     if (this.resolvers.length > 0) {
       const resolve = this.resolvers.shift()!;
       resolve(item);
+      return true;
     } else if (this.queue.length < this.maxSize) {
       this.queue.push(item);
       return true;
