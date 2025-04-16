@@ -64,10 +64,9 @@ if __name__ == '__main__':
             if iter <= 200: req.append(tot)
 
             if iter > 0 and should_scale(target_workload, current_mcl):
-                target_instances = math.ceil(target_workload/COMPONENT_MCL)
+                target_instances = max(math.ceil(target_workload/COMPONENT_MCL),starting_instances)
                 if target_instances != number_of_instances:
                     el.call_soon_threadsafe(lambda replicas=target_instances: k8s_client.patch_namespaced_deployment_scale(name=MANIFEST_NAME, namespace="default", body={'spec': {'replicas': replicas}}))
-                    number_of_instances = target_instances if target_instances > starting_instances else starting_instances
                 print(f"Registered workload: {tot/SLEEP_TIME}")
                 print(f"Target WL: {target_workload}")
                 print(f"Current MCL {current_mcl}, Future MCL: {COMPONENT_MCL * number_of_instances}")
