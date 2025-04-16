@@ -67,6 +67,8 @@ spec:
               value: "prometheus-service.monitoring.svc.cluster.local"
             - name: PROMETHEUS_SERVICE_PORT
               value: "8080"
+            - name: MONITOR_ONLY
+              value: "true"
       restartPolicy: Always
 ---
 apiVersion: v1

@@ -34,6 +34,7 @@ if __name__ == '__main__':
     prometheus_service_port = os.environ.get("PROMETHEUS_SERVICE_PORT", "53165")
     prometheus_url = f"http://{prometheus_service_address}:{prometheus_service_port}"
     prometheus_instance = PrometheusConnect(url=prometheus_url)
+    min_inst = int(os.environ.get("MIN_INST", "1"))
 
     instances_number = Gauge('total_instances_number', 'Present in the system')
     req = []
@@ -53,7 +54,6 @@ if __name__ == '__main__':
         print("Monitoring the system...")
         current_mcl = starting_mcl
         number_of_instances = starting_instances
-        sl = 1
         iter = 0
         while True:
             print("Checking the system...", flush=True)
@@ -64,21 +64,18 @@ if __name__ == '__main__':
             if iter <= 200: req.append(tot)
 
             if iter > 0 and should_scale(target_workload, current_mcl):
-                instances = math.ceil(target_workload/COMPONENT_MCL)
-                instances = instances if instances > 0 else 1
-                
+                target_instances = math.ceil(target_workload/COMPONENT_MCL)
+                if target_instances != number_of_instances:
+                    el.call_soon_threadsafe(lambda replicas=target_instances: k8s_client.patch_namespaced_deployment_scale(name=MANIFEST_NAME, namespace="default", body={'spec': {'replicas': replicas}}))
+                    number_of_instances = target_instances if target_instances > starting_instances else starting_instances
                 print(f"Registered workload: {tot/SLEEP_TIME}")
                 print(f"Target WL: {target_workload}")
-                print(f"Current MCL {current_mcl}, Future MCL: {COMPONENT_MCL * instances}")
-                print(f"Instances: {instances}")
-                el.call_soon_threadsafe(lambda replicas=instances: k8s_client.patch_namespaced_deployment_scale(name=MANIFEST_NAME, namespace="default", body={'spec': {'replicas': replicas}}))
-                number_of_instances = instances
-                current_mcl = COMPONENT_MCL * instances
-
-            instances_number.set(number_of_instances)
-           
+                print(f"Current MCL {current_mcl}, Future MCL: {COMPONENT_MCL * number_of_instances}")
+                print(f"Instances: {number_of_instances}")
+                current_mcl = COMPONENT_MCL * number_of_instances
+                instances_number.set(number_of_instances)
             iter += SLEEP_TIME
-            time.sleep(sl)
+            time.sleep(SLEEP_TIME)
 
 
     def should_scale(inbound_workload, curr_mcl) -> bool:
@@ -91,5 +88,5 @@ if __name__ == '__main__':
         return sys_mcl - (target_workload + k_big) >= 0
 
     start_http_server(SERVICE_PORT)
-    guard(COMPONENT_MCL, 1)
+    guard(COMPONENT_MCL, min_inst)
 

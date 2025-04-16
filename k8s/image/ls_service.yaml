@@ -42,6 +42,9 @@ spec:
               value: "http_requests_total_image_counter"
             - name: SERVICE_PORT
               value: "7003"
+            - name: MIN_INST
+              value: "2"
+
             
 ---
 apiVersion: v1
