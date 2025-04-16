@@ -44,16 +44,21 @@ const port = process.env.PORT ?? "9001";
 app.use(rateLimitMiddleware);
 app.get("/metrics", prometheusMetrics);
 app.post("/request", async (req: Request, res: Response) => {
-  const start = Date.now();
-  await sleep(1000/mcl);
-  if (serviceName == "webUI") {
-    await webuiTask();
-    const duration = Date.now() - start;
-    behaviourTimeCounter.inc(duration);
+  try {
+    const start = Date.now();
+    await sleep(1000/mcl);
+    if (serviceName == "webUI") {
+      await webuiTask();
+      const duration = Date.now() - start;
+      behaviourTimeCounter.inc(duration);
+    }
+    else if (serviceName == "auth") await axios.post("http://persistence-service/request");
+    console.log("Req parsed");
+    res.sendStatus(200);
+  } catch (err) {
+    console.error("Error handling /request:", err);
+    res.sendStatus(500);
   }
-  else if (serviceName == "auth") await axios.post("http://persistence-service/request");
-  console.log("Req parsed");
-  res.sendStatus(200);
 });
 
 const server = app.listen(port, () => {
