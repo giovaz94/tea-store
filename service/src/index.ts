@@ -13,8 +13,9 @@ type Task = {
 };
 
 ///PROM METRICS///
+const max_queue_size = parseInt(process.env.MAX_SIZE || "50");
 const serviceName: string = process.env.SERVICE_NAME || "undefinedService";
-// const lostMessage = createLostMessageCounter(serviceName);
+const lostMessage = createLostMessageCounter(serviceName);
 const incomingMessages = createIncomingMessageCounter(serviceName);
 let behaviourCounter: Counter<string>;
 let behaviourTimeCounter: Counter<string>;
@@ -33,26 +34,30 @@ const queue: Task[] = [];
 
 function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
   incomingMessages.inc();
-  const arrivalTime = Date.now(); 
-  const ready = new Promise<Task>((resolve) => {
-    const task: Task = {
-      req,
-      res,
-      next,
-      arrivalTime,
-      resolve: (task) => resolve(task),
-    };
-    queue.push(task);
-  });
-
-  ready.then((task) => {
-    if (serviceName === "webUI") {
-      webuiTask(task);  
-    } else if (serviceName === "auth") {
-      axios.post("http://persistence-service/request");
-    }
-    next();
-  });
+  if (queue.length >= max_queue_size) {
+    lostMessage.inc(); 
+    res.status(500);
+  } else {
+    const arrivalTime = Date.now(); 
+    const ready = new Promise<Task>((resolve) => {
+      const task: Task = {
+        req,
+        res,
+        next,
+        arrivalTime,
+        resolve: (task) => resolve(task),
+      };
+      queue.push(task);
+    });
+    ready.then((task) => {
+      if (serviceName === "webUI") {
+        webuiTask(task);  
+      } else if (serviceName === "auth") {
+        axios.post("http://persistence-service/request");
+      }
+      next();
+    });
+  }
 }
 
 const app = express();
