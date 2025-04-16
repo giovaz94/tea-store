@@ -15,7 +15,7 @@ spec:
       serviceAccountName: ls-service-account
       containers:
         - name: ls-algorithm
-          image: giovaz94/local_scaling
+          image: giovaz94/tea-store-ls
           imagePullPolicy: Always
           ports:
             - containerPort: 7001
@@ -39,7 +39,7 @@ spec:
             - name: MANIFEST_NAME
               value: "auth"
             - name: METRIC_NAME
-              value: "http_requests_total_attachment_manager_counter" #TODO CHANGE THIS
+              value: "http_requests_total_auth_counter"
             - name: SERVICE_PORT
               value: "7001"
             

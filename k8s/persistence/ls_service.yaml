@@ -39,7 +39,7 @@ spec:
             - name: MANIFEST_NAME
               value: "persistence"
             - name: METRIC_NAME
-              value: "http_requests_total_attachment_manager_counter" #TODO CHANGE THIS
+              value: "http_requests_total_persistence_counter"
             - name: SERVICE_PORT
               value: "7002" 
             

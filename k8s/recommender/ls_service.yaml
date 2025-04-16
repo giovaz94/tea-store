@@ -39,7 +39,7 @@ spec:
             - name: MANIFEST_NAME
               value: "recommender"
             - name: METRIC_NAME
-              value: "http_requests_total_attachment_manager_counter" #TODO CHANGE THIS
+              value: "http_requests_total_recommender_counter"
             - name: SERVICE_PORT
               value: "7005"
             
