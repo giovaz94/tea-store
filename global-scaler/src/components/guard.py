@@ -32,12 +32,15 @@ class Guard:
 
         prometheus_service_address = os.environ.get("PROMETHEUS_SERVICE_ADDRESS", "100.66.83.79")
         prometheus_service_port = os.environ.get("PROMETHEUS_SERVICE_PORT", "30000")
+
+        self.monitor_only = os.environ.get("MONITOR_ONLY", "false").lower() == 'true'
         prometheus_url = f"http://{prometheus_service_address}:{prometheus_service_port}"
         self.prometheus_instance = PrometheusConnect(url=prometheus_url)
 
         self.proactiveness = os.environ.get("PROACTIVE", "false").lower() == 'true' #change to an env variable
         self.proactive_reactive = self.proactiveness and os.environ.get("PROACTIVE_REACTIVE", "false").lower() == 'true' 
         self.predictions = predictions
+        
 
     def start(self) -> None:
         """
@@ -116,7 +119,7 @@ class Guard:
 
             if self.should_scale(target_workload, current_mcl):
                 target_conf = self.scaler.calculate_configuration(target_workload + self.k_big)
-                current_mcl, _ = self.scaler.process_request(target_conf)    
+                current_mcl, _ = self.scaler.process_request(target_conf, self.monitor_only)    
 
             iter += self.sleep
             time.sleep(self.sleep)
