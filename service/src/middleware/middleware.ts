@@ -88,9 +88,14 @@ export async function processQueue() {
   while (true) {
     let lostMessageFlag = false;
     const startTime = await queue.dequeue();
-    // console.log("Processed:", item);
     let executions = 1;
     if (serviceName === "webUI") {
+      const response = await axios.post("http://auth-service/request");
+      if (response.status === 500 && serviceName === "webUI") {
+        console.error(`Received 500 status from http://auth-service/request`);
+        lostMessage.inc();
+        lostMessageFlag = true;
+      } 
       executions = Math.floor(Math.random() * 5) + 1;
     }
     let sleepTime = calculateSleepTime(mcl);
