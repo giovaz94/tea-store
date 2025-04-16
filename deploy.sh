@@ -23,6 +23,9 @@ check_kubectl() {
 
 deploy_global() {
   echo -e "${YELLOW}Executing GLOBAL deployment...${NC}"
+
+  echo -e "${GREEN}Deploying role...${NC}"
+  kubectl apply -f "$K8S_DIR/roles" && check_error
   
   echo -e "${GREEN}Deploying prometheus...${NC}"
   kubectl apply -f "$K8S_DIR/prometheus" && check_error

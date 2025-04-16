@@ -12,7 +12,7 @@ if __name__ == '__main__':
     base = np.array([1, 1, 1, 1, 2]) # webui, Persistence, Auth, Recommender, Image
 
     # Microservices MCL and MF
-    microservices_mcl = np.array([150, 905, 190, 2580, 600]) #
+    microservices_mcl = np.array([150, 905, 190, 2800, 600]) #
     microservices_mf = np.array([1, 4, 1, 3, 6])   
 
     # Replicas for each increment

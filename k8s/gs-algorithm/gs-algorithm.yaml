@@ -11,7 +11,7 @@ spec:
       labels:
         app: gs-algorithm
     spec:
-      # serviceAccountName: scaler-service-account
+      #serviceAccountName: scaler-service-account
       containers:
         - name: gs-algorithm
           image: giovaz94/tea-store-gs
@@ -22,11 +22,11 @@ spec:
             - name: INCLUSTER_CONFIG
               value: "true"
             - name: K_BIG
-              value: "35"
+              value: "60"
             - name:  SLEEP
               value: "10"
             - name: K
-              value: "10"
+              value: "5"
             - name: ERROR_LIMIT
               value: "3"
             - name: PROACTIVE

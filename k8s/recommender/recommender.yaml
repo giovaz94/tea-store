@@ -19,13 +19,13 @@ spec:
             - containerPort: 80
           env:
             - name: MCL
-              value: "2580"
+              value: "2800"
             - name: SERVICE_NAME
               value: "recommender"
             - name: PORT
               value: "80"
             - name: MAX_SIZE
-              value: "150"
+              value: "200"
             - name: OUTPUT_SERVICES
               value: '{}'
       restartPolicy: Always
