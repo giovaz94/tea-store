@@ -2,15 +2,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ls-algorithm-webUI
+  name: ls-algorithm-webui
 spec:
   selector:
     matchLabels:
-      app: ls-algorithm-webUI
+      app: ls-algorithm-webui
   template:
     metadata:
       labels:
-        app: ls-algorithm-webUI
+        app: ls-algorithm-webui
     spec:
       serviceAccountName: ls-service-account
       containers:
@@ -37,7 +37,7 @@ spec:
             - name: PROMETHEUS_SERVICE_PORT
               value: "8080"
             - name: MANIFEST_NAME
-              value: "webUI"
+              value: "webui"
             - name: METRIC_NAME
               value: "http_requests_total_webUI_counter"
             - name: SERVICE_PORT
@@ -47,10 +47,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ls-algorithm-webUI-service
+  name: ls-algorithm-webui-service
 spec:
   selector:
-    app: ls-algorithm-webUI
+    app: ls-algorithm-webui
   ports:
     - protocol: TCP
       port: 7000

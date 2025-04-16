@@ -15,8 +15,8 @@ spec:
       serviceAccountName: ls-service-account
       containers:
         - name: ls-algorithm
-          recommender: giovaz94/local_scaling
-          recommenderPullPolicy: Always
+          image: giovaz94/local_scaling
+          imagePullPolicy: Always
           ports:
             - containerPort: 7005
           env:
