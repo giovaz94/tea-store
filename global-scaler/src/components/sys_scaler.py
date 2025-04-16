@@ -80,7 +80,7 @@ class SysScaler:
         """
         return self.curr_config
     
-    def process_request(self, deltas, monitor_mode = False):
+    def process_request(self, deltas):
         """
         Process a scaling request.
     
@@ -94,8 +94,7 @@ class SysScaler:
         else:
             increments_to_apply = deltas - self.total_increment
         
-        if not monitor_mode:
-            self._apply_increment(increments_to_apply)
+        self._apply_increment(increments_to_apply)
 
         self.total_increment = deltas
         self.mcl = self.estimate_mcl(self.curr_config)
