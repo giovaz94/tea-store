@@ -117,9 +117,9 @@ class Guard:
             toPrint += " tot: " + str(measured_workload * self.sleep) + " comp: " + str(completed) + " rej: " + str(loss) + " supp: " + str(current_mcl) + " inst: " + str(np.sum(config))
             print(toPrint, flush=True)
 
-            if self.should_scale(target_workload, current_mcl):
+            if self.should_scale(target_workload, current_mcl) and not self.monitor_only:
                 target_conf = self.scaler.calculate_configuration(target_workload + self.k_big)
-                current_mcl, _ = self.scaler.process_request(target_conf, self.monitor_only)    
+                current_mcl, _ = self.scaler.process_request(target_conf)    
 
             iter += self.sleep
             time.sleep(self.sleep)
