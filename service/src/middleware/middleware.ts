@@ -96,7 +96,7 @@ export async function processQueue() {
     let sleepTime = calculateSleepTime(mcl);
     console.log(outputServices.entries());
     await sleep(sleepTime);
-    while (executions > 0) {
+    while (executions > 0 && !lostMessageFlag) {
       for (const [url, numberOfRequests] of outputServices.entries()) {
         const n = parseInt(numberOfRequests, 10);
         console.log(`Sending ${n} requests to ${url}`);
