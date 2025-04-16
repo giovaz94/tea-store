@@ -107,14 +107,14 @@ class Guard:
                 target_workload = pred_workload
             if self.proactiveness: toPrint += " next: " + str(pred_workload)
             toPrint += " measured: " + str(measured_workload)
-            config = self.scaler.get_current_config()
+            config = np.sum(self.scaler.get_current_config()) if not self.monitor_only else self._execute_prometheus_query("sum(total_instances_number)")
             #proactivity + reactivity:
             if iter > 0 and self.proactive_reactive:
                 measured_conf = self.scaler.calculate_configuration(measured_workload + self.k_big)
                 target_workload = self.mixer.mix(measured_workload, pred_workload, last_pred_conf, measured_conf)
                 last_pred_conf = self.scaler.calculate_configuration(pred_workload + self.k_big)
             if self.proactive_reactive: toPrint += " mixed: " + str(target_workload)
-            toPrint += " tot: " + str(measured_workload * self.sleep) + " comp: " + str(completed) + " rej: " + str(loss) + " supp: " + str(current_mcl) + " inst: " + str(np.sum(config))
+            toPrint += " tot: " + str(measured_workload * self.sleep) + " comp: " + str(completed) + " rej: " + str(loss) + " supp: " + str(current_mcl) + " inst: " + str(config)
             print(toPrint, flush=True)
 
             if self.should_scale(target_workload, current_mcl) and not self.monitor_only:
