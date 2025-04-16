@@ -14,7 +14,7 @@ spec:
       containers:
         - name: gs-algorithm
           image: giovaz94/tea-store-gs
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5000
           env:

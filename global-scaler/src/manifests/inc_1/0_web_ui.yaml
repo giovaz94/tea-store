@@ -8,7 +8,7 @@ spec:
   containers:
     - name: webui
       image: giovaz94/tea-store-general 
-      imagePullPolicy: Always
+      imagePullPolicy: IfNotPresent
       ports:
         - containerPort: 80
       env:
@@ -17,7 +17,7 @@ spec:
         - name: SERVICE_NAME
           value: "webUI"
         - name: MAX_SIZE
-          value: "120"
+          value: "200"
         - name: PORT
           value: "80"
         - name: OUTPUT_SERVICES
