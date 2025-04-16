@@ -62,6 +62,7 @@ function sleep(ms: number) {
 }
 
 const webuiTask = async () => {
+  const start = Date.now();
   incomingMessages.inc();
   await axios.post("http://auth-service/request");
   let executions = Math.floor(Math.random() * 5) + 1;
@@ -81,6 +82,8 @@ const webuiTask = async () => {
       }
     executions--;
   }
+  behaviourCounter.inc();
+  behaviourTimeCounter.inc(Date.now() - startTime);
 };
 
 setInterval(() => {
