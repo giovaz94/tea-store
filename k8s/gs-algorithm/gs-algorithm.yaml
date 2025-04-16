@@ -52,11 +52,11 @@ spec:
             - name: INCLUSTER_CONFIG
               value: "true"
             - name: K_BIG
-              value: "10"
+              value: "35"
             - name:  SLEEP
               value: "10"
             - name: K
-              value: "8"
+              value: "10"
             - name: ERROR_LIMIT
               value: "3"
             - name: PROACTIVE
