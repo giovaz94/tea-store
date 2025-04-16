@@ -48,7 +48,7 @@ app.post("/request", async (req: Request, res: Response) => {
   if (serviceName == "webUI") webuiTask();
   else if (serviceName == "auth") axios.post("http://persistence-service/request");
   console.log("Req parsed");
-  res.send(200);
+  res.sendStatus(200);
 });
 
 const server = app.listen(port, () => {
