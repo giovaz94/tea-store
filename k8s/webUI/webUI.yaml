@@ -25,7 +25,7 @@ spec:
             - name: PORT
               value: "80"
             - name: MAX_SIZE
-              value: "100"
+              value: "200"
             - name: OUTPUT_SERVICES
               value: '{"http://persistence-service/request":"1", "http://recommender-service/request":"1", "http://image-service/request":"2"}'
       restartPolicy: Always
