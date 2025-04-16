@@ -136,12 +136,15 @@ undeploy_all() {
   kubectl delete -f "$K8S_DIR/auth" --ignore-not-found=true
   kubectl delete -f "$K8S_DIR/auth/auth.yaml" --ignore-not-found=true
 
-  echo -e "${GREEN}Removing auth...${NC}"
+  echo -e "${GREEN}Removing image...${NC}"
   kubectl delete -f "$K8S_DIR/image" --ignore-not-found=true
   kubectl delete -f "$K8S_DIR/image/image.yaml" --ignore-not-found=true
   
   echo -e "${GREEN}Removing prometheus...${NC}"
   kubectl delete -f "$K8S_DIR/prometheus" --ignore-not-found=true
+
+  echo -e "${GREEN}Removing roles...${NC}"
+  kubectl delete -f "$K8S_DIR/roles" --ignore-not-found=true
   
   echo -e "${GREEN}All components successfully removed!${NC}"
 }

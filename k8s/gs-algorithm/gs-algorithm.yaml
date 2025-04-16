@@ -11,10 +11,11 @@ spec:
       labels:
         app: gs-algorithm
     spec:
+      serviceAccountName: gs-service-account
       containers:
         - name: gs-algorithm
           image: giovaz94/tea-store-gs
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 5000
           env:
