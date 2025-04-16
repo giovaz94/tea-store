@@ -32,6 +32,7 @@ const outputServices: Map<string, string> = new Map(Object.entries(JSON.parse(pr
 const queue: Task[] = [];
 
 function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
+  incomingMessages.inc();
   const arrivalTime = Date.now(); 
   const ready = new Promise<Task>((resolve) => {
     const task: Task = {
@@ -74,7 +75,6 @@ function sleep(ms: number) {
 }
 
 const webuiTask = async (task: Task) => {
-  incomingMessages.inc();
   await axios.post("http://auth-service/request");
   let executions = Math.floor(Math.random() * 5) + 1;
   console.log("Browsing " + executions + " times");
