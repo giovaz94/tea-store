@@ -55,10 +55,6 @@ const workload = [
 // ];
 
 var stop = false;
-
-
-
-
 app.post('/start', (req: Request, res: Response) => {
     stop = false;
     var index = 0;
@@ -67,12 +63,16 @@ app.post('/start', (req: Request, res: Response) => {
             const r = workload[index++];
             console.log(`Sending ${r} requests per second`);
             for (let i = 0; i < r; i++) {
-                try {
-                    axios.post(url);
-                } catch (error: unknown) {
-                    const errorMessage = error instanceof Error ? error.message : "Unknown Error";
-                    console.error(`Error sending request to ${url}: ${errorMessage}`);
-                }
+                axios.post(url).catch((error) => {
+                    if (axios.isAxiosError(error)) {
+                        console.error(`Request error ${url}: ${error.message}`);
+                        if (error.response) {
+                            console.error(`Status code: ${error.response.status}`);
+                        }
+                    } else {
+                        console.error(`Generic Error: ${error}`);
+                    }
+                });
                 
             }
             await new Promise(resolve => setTimeout(resolve, 1000));

@@ -30,7 +30,7 @@ class Guard:
         self.scaler = scaler
         self.mixer = mixer
 
-        prometheus_service_address = os.environ.get("PROMETHEUS_SERVICE_ADDRESS", "192.168.0.139")
+        prometheus_service_address = os.environ.get("PROMETHEUS_SERVICE_ADDRESS", "100.66.83.79")
         prometheus_service_port = os.environ.get("PROMETHEUS_SERVICE_PORT", "30000")
         prometheus_url = f"http://{prometheus_service_address}:{prometheus_service_port}"
         self.prometheus_instance = PrometheusConnect(url=prometheus_url)
@@ -73,8 +73,6 @@ class Guard:
         Check the conditions of the system and eventually scale it.
         """
         print("Monitoring the system...")
-        init_val = self._execute_prometheus_query("sum(http_requests_total_webUI_counter)")
-        sl = 1
         iter = 0
         last_pred_conf = []
         current_mcl = self.scaler.get_mcl()
@@ -120,12 +118,5 @@ class Guard:
                 target_conf = self.scaler.calculate_configuration(target_workload + self.k_big)
                 current_mcl, _ = self.scaler.process_request(target_conf)    
 
-            # if tot - init_val > 0:
-            #     init_val = tot if iter > 0 else init_val
-            #     sl = self.sleep if iter > 0 else self.sleep - sl
-            #     iter += self.sleep
-            #     stop = time.time()
-            #     time_difference = stop - start
-            #     sl -= time_difference
             iter += self.sleep
             time.sleep(self.sleep)
