@@ -48,6 +48,7 @@ app.post("/request", async (req: Request, res: Response) => {
   if (serviceName == "webUI") webuiTask();
   else if (serviceName == "auth") axios.post("http://persistence-service/request");
   console.log("Req parsed");
+  res.send(200);
 });
 
 const server = app.listen(port, () => {
@@ -64,6 +65,7 @@ const webuiTask = async () => {
   incomingMessages.inc();
   await axios.post("http://auth-service/request");
   let executions = Math.floor(Math.random() * 5) + 1;
+  console.log("Browsing" + executions + " times");
   while (executions > 0) {
     for (const [url, numberOfRequests] of outputServices.entries()) {
       const n = parseInt(numberOfRequests, 10);
