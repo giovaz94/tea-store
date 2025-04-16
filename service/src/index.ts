@@ -83,7 +83,7 @@ const webuiTask = async () => {
     executions--;
   }
   behaviourCounter.inc();
-  behaviourTimeCounter.inc(Date.now() - startTime);
+  behaviourTimeCounter.inc(Date.now() - start);
 };
 
 setInterval(() => {
