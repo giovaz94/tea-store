@@ -48,9 +48,7 @@ app.post("/request", async (req: Request, res: Response) => {
     const start = Date.now();
     await sleep(1000/mcl);
     if (serviceName == "webUI") {
-      webuiTask();
-      const duration = Date.now() - start;
-      behaviourTimeCounter.inc(duration);
+      webuiTask(start);
     }
     else if (serviceName == "auth") axios.post("http://persistence-service/request");
     console.log("Req parsed");
@@ -71,7 +69,7 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-const webuiTask = async () => {
+const webuiTask = async (start: number) => {
   incomingMessages.inc();
   await axios.post("http://auth-service/request");
   let executions = Math.floor(Math.random() * 5) + 1;
@@ -91,7 +89,9 @@ const webuiTask = async () => {
       }
     executions--;
   }
+  const duration = Date.now() - start;
   behaviourCounter.inc();
+  behaviourTimeCounter.inc(duration);
 };
 
 setInterval(() => {
