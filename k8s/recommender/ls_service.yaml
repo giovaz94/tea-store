@@ -16,7 +16,7 @@ spec:
       containers:
         - name: ls-algorithm
           image: giovaz94/tea-store-ls
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 7005
           env:
