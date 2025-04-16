@@ -11,7 +11,6 @@ spec:
       labels:
         app: gs-algorithm
     spec:
-      serviceAccountName: gs-service-account
       containers:
         - name: gs-algorithm
           image: giovaz94/tea-store-gs
@@ -29,8 +28,6 @@ spec:
               value: "10"
             - name: ERROR_LIMIT
               value: "3"
-            - name: MONITOR_ONLY
-              value: "false"
             - name: PROACTIVE
               value: "false"
             - name: PROACTIVE_REACTIVE
