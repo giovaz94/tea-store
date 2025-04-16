@@ -56,9 +56,8 @@ function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
 
 const app = express();
 const port = process.env.PORT ?? "9001";
-app.use(rateLimitMiddleware);
 app.get("/metrics", prometheusMetrics);
-app.post("/request", async (_req: Request, res: Response) => {
+app.post("/request", rateLimitMiddleware, async (_req: Request, res: Response) => {
   try {
     await sleep(1000 / mcl);
     console.log("Req parsed");
