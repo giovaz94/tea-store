@@ -77,6 +77,10 @@ export const handleRequest: RequestHandler = async (_, res) => {
   incomingMessages.inc();
   const enqueueSuccessful = queue.enqueue([startTime, res]);
   
+  if(enqueueSuccessful && serviceName === "webUI") {
+    res.status(200).send("OK");
+  }
+
   if (!enqueueSuccessful) {
     res.status(500).send("Service Unavailable: Queue is full");
   }
@@ -89,7 +93,10 @@ export async function processQueue() {
     const startTime = itemDequeued[0];
     const response = itemDequeued[1]
 
-    response.status(200).send("OK");
+    if(serviceName !== "webUI") {
+      response.status(200).send("OK");
+    }
+    
     let executions = 1;
     if (serviceName === "webUI") {
       const response = await axios.post("http://auth-service/request");
