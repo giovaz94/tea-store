@@ -77,6 +77,9 @@ deploy_local() {
   
   echo -e "${GREEN}Deploying webUI...${NC}"
   kubectl apply -f "$K8S_DIR/webUI" && check_error
+
+  echo -e "${GREEN}Deploying gs-algorithm...${NC}"
+  kubectl apply -f "$K8S_DIR/gs-algorithm/gs-algorithm.yaml" && check_error
   
   echo -e "${GREEN}Deployment completed successfully!${NC}"
 }
