@@ -29,6 +29,8 @@ spec:
               value: "10"
             - name: ERROR_LIMIT
               value: "3"
+            - name: MONITOR_ONLY
+              value: "false"
             - name: PROACTIVE
               value: "false"
             - name: PROACTIVE_REACTIVE
