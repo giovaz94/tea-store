@@ -7,15 +7,21 @@ import {
 } from "#utils/prometheus.js";
 import { createBehaviourCounter, createBehaviourTimeCounter } from "../utils/prometheus";
 import { Counter } from "prom-client";
-import { connect } from "http2";
 
 
 //////BLOCKING QUEUE///////
 class BlockingQueue<T> {
   private queue: T[] = [];
   private resolvers: ((value: T) => void)[] = [];
-  private maxSizeString: string = process.env.MAX_SIZE || "50";
-  private maxSize: number = parseInt(this.maxSizeString);
+  private maxSize: number;
+  private serviceName: string;
+  private loss: Counter<string>;
+
+  constructor(maxSize: number, serviceName: string, loss: Counter<string>) {
+    this.maxSize = maxSize;
+    this.serviceName = serviceName;
+    this.loss = loss;
+  }
 
   enqueue(item: T): boolean {
     if (this.resolvers.length > 0) {
@@ -27,6 +33,7 @@ class BlockingQueue<T> {
       return true;
     } else {
       console.log("request rejected");
+      if (this.serviceName == 'webUI') this.loss.inc();
       return false;
     }
   }
@@ -47,15 +54,17 @@ const outputServices: Map<string, string> = new Map(
   Object.entries(JSON.parse(process.env.OUTPUT_SERVICES || "{}")),
 );
 const serviceName: string = process.env.SERVICE_NAME || "undefinedService";
-const queue = new BlockingQueue<any>();
+const maxSize: number = parseInt(process.env.MAX_SIZE || "50");
+const lostMessage = createLostMessageCounter(serviceName);
+const incomingMessages = createIncomingMessageCounter(serviceName);
+const queue = new BlockingQueue<any>(maxSize, serviceName, lostMessage);
 
 if (process.env.MCL === undefined) {
   throw new Error("The MCL for the following service isn't defined");
 }
 const mcl: number = parseInt(process.env.MCL as string, 10);
 
-const lostMessage = createLostMessageCounter(serviceName);
-const incomingMessages = createIncomingMessageCounter(serviceName);
+
 let behaviourCounter: Counter<string>;
 let behaviourTimeCounter: Counter<string>;
 if (serviceName === "webUI") {
