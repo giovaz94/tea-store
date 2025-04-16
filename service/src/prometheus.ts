@@ -1,6 +1,13 @@
+import { RequestHandler } from "express";
 import { Counter, Registry } from "prom-client";
 
-export const register = new Registry();
+const register = new Registry();
+
+
+export const prometheusMetrics: RequestHandler = async (req: any, res: any) => {
+  res.set("Content-Type", register.contentType);
+  res.end(await register.metrics());
+};
 
 export function createCounter(
   name: string,

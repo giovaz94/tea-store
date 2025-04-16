@@ -1,50 +1,89 @@
 import express from "express";
-import cluster from "cluster";
-import { cpus } from "os";
-import { handleRequest, processQueue } from "#middleware/middleware.js";
-import { prometheusMetrics } from "#middleware/prometheus.js";
+import { Request, Response, NextFunction } from 'express';
+import { prometheusMetrics, createIncomingMessageCounter, createLostMessageCounter, createBehaviourCounter, createBehaviourTimeCounter } from "#prometheus";
+import { Counter } from "prom-client";
+import axios from "axios";
 
-// const numCPUs = cpus().length;
-// const port = process.env.PORT ?? "9001";
+type Task = {
+  resolve: () => void;
+  req: Request;
+  res: Response;
+  next: NextFunction;
+};
 
-// if (cluster.isPrimary) {
-//   console.log(`Master ${process.pid} is running`);
-//   console.log(`Starting ${numCPUs} workers...`);
+///PROM METRICS///
+const serviceName: string = process.env.SERVICE_NAME || "undefinedService";
+// const lostMessage = createLostMessageCounter(serviceName);
+const incomingMessages = createIncomingMessageCounter(serviceName);
+let behaviourCounter: Counter<string>;
+let behaviourTimeCounter: Counter<string>;
+if (serviceName === "webUI") {
+  behaviourCounter = createBehaviourCounter();
+  behaviourTimeCounter = createBehaviourTimeCounter();
+}
+////////////////
 
-//   for (let i = 0; i < numCPUs; i++) {
-//     cluster.fork();
-//   }
+if (process.env.MCL === undefined) {
+  throw new Error("The MCL for the following service isn't defined");
+}
+const mcl: number = parseInt(process.env.MCL as string, 10);
+const outputServices: Map<string, string> = new Map(Object.entries(JSON.parse(process.env.OUTPUT_SERVICES || "{}")),);
+const queue: Task[] = [];
 
-//   cluster.on('exit', (worker, code, signal) => {
-//     console.log(`Worker ${worker.process.pid} died. Restarting...`);
-//     cluster.fork();
-//   });
-// } else {
-//   const app = express();
-
-//   app.get("/metrics", prometheusMetrics);
-//   app.post("/request", handleRequest);
-//   processQueue();
-
-//   const server = app.listen(port, () => {
-//     server.keepAliveTimeout = 65000;
-//     server.headersTimeout = 66000;
-    
-//     console.log(`Worker ${process.pid} started and listening on port ${port}`);
-//   });
-
-//   console.log(`Worker ${process.pid} started`);
-// }
+function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
+  const ready = new Promise<void>((resolve) => {
+    queue.push({ resolve, req, res, next });
+  });
+  ready.then(() => {
+    next();
+  });
+}
 
 const app = express();
 const port = process.env.PORT ?? "9001";
-const serviceName: string = process.env.SERVICE_NAME || "undefinedService";
+app.use(rateLimitMiddleware);
 app.get("/metrics", prometheusMetrics);
-app.post("/request", handleRequest);
-processQueue();
+app.post("/request", async (req: Request, res: Response) => {
+  await sleep(1000/mcl);
+  if (serviceName == "webUI") webuiTask();
+  else if (serviceName == "auth") axios.post("http://persistence-service/request");
+  console.log("Req parsed");
+});
 
 const server = app.listen(port, () => {
   server.keepAliveTimeout = 65000;
   server.headersTimeout = 66000;
   console.log(`${serviceName} started and listening on port ${port}`);
 });
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+const webuiTask = async () => {
+  incomingMessages.inc();
+  await axios.post("http://auth-service/request");
+  let executions = Math.floor(Math.random() * 5) + 1;
+  while (executions > 0) {
+    for (const [url, numberOfRequests] of outputServices.entries()) {
+      const n = parseInt(numberOfRequests, 10);
+      console.log(`Sending ${n} requests to ${url}`);
+      for (let i = 0; i < n; i++) {
+        try {
+          await axios.post(url);
+        } catch (error: unknown) {
+          const errorMessage = error instanceof Error ? error.message : "Unknown Error";
+          console.error(`Error sending request to ${url}: ${errorMessage}`);
+          }
+        }
+      }
+    executions--;
+  }
+};
+
+setInterval(() => {
+  const task = queue.shift();
+  if (task) {
+    task.resolve();
+  }
+}, 1000 / mcl);
