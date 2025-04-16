@@ -12,11 +12,11 @@ spec:
       labels:
         app: ls-algorithm-auth
     spec:
-      serviceAccountName: ls-service-account
+      serviceAccountName: scaler-service-account
       containers:
         - name: ls-algorithm
           image: giovaz94/tea-store-ls
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 7001
           env:

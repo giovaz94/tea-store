@@ -11,7 +11,7 @@ spec:
       labels:
         app: gs-algorithm
     spec:
-      serviceAccountName: gs-service-account
+      # serviceAccountName: scaler-service-account
       containers:
         - name: gs-algorithm
           image: giovaz94/tea-store-gs
