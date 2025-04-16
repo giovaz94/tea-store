@@ -5,7 +5,7 @@ import { Counter } from "prom-client";
 import axios from "axios";
 
 type Task = {
-  resolve: () => void;
+  resolve: (task: Task) => void;
   req: Request;
   res: Response;
   arrivalTime: number;
@@ -33,10 +33,23 @@ const queue: Task[] = [];
 
 function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
   const arrivalTime = Date.now(); 
-  const ready = new Promise<void>((resolve) => {
-    queue.push({ resolve, req, res, next, arrivalTime });
+  const ready = new Promise<Task>((resolve) => {
+    const task: Task = {
+      req,
+      res,
+      next,
+      arrivalTime,
+      resolve: (task) => resolve(task),
+    };
+    queue.push(task);
   });
-  ready.then(() => {
+
+  ready.then((task) => {
+    if (serviceName === "webUI") {
+      webuiTask(task);  
+    } else if (serviceName === "auth") {
+      axios.post("http://persistence-service/request");
+    }
     next();
   });
 }
@@ -45,13 +58,9 @@ const app = express();
 const port = process.env.PORT ?? "9001";
 app.use(rateLimitMiddleware);
 app.get("/metrics", prometheusMetrics);
-app.post("/request", async (req: Request, res: Response) => {
+app.post("/request", async (_req: Request, res: Response) => {
   try {
-    await sleep(1000/mcl);
-    if (serviceName == "webUI") {
-      webuiTask(req);
-    }
-    else if (serviceName == "auth") axios.post("http://persistence-service/request");
+    await sleep(1000 / mcl);
     console.log("Req parsed");
     res.sendStatus(200);
   } catch (err) {
@@ -60,17 +69,16 @@ app.post("/request", async (req: Request, res: Response) => {
   }
 });
 
+
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-const webuiTask = async (req: Request) => {
-  const task: Task | null = queue.find(t => t.req === req) || null;
-  if (!task) return;
+const webuiTask = async (task: Task) => {
   incomingMessages.inc();
   await axios.post("http://auth-service/request");
   let executions = Math.floor(Math.random() * 5) + 1;
-  console.log("Browsing" + executions + " times");
+  console.log("Browsing " + executions + " times");
   while (executions > 0) {
     for (const [url, numberOfRequests] of outputServices.entries()) {
       const n = parseInt(numberOfRequests, 10);
@@ -95,7 +103,7 @@ const webuiTask = async (req: Request) => {
 setInterval(() => {
   const task = queue.shift();
   if (task) {
-    task.resolve();
+    task.resolve(task);
   }
 }, 1000 / mcl);
 
