@@ -75,7 +75,7 @@ if(serviceName === "webUI") {
 } else {
   app.post("/request", async (_req: Request, res: Response) => {
     try {
-      // await sleep(1000 / mcl);
+      incomingMessages.inc();
       if(serviceName === "auth"){
         const code = await axios.post("http://persistence-service/request");
         res.sendStatus(code.status);
