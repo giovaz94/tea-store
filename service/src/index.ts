@@ -89,9 +89,9 @@ const webuiTask = async (task: Task) => {
           if (response.status === 500 && serviceName === "webUI") {
             lostMessage.inc(); 
             break;
-          }
         }
       }
+    }
     executions--;
   }
     if (response.status !== 500) {
