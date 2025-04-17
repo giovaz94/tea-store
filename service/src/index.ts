@@ -65,7 +65,7 @@ const port = process.env.PORT ?? "9001";
 app.get("/metrics", prometheusMetrics);
 app.post("/request", rateLimitMiddleware, async (_req: Request, res: Response) => {
   try {
-    await sleep(1000 / mcl);
+    // await sleep(1000 / mcl);
     console.log("Req parsed");
     res.sendStatus(200);
   } catch (err) {
