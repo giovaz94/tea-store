@@ -29,7 +29,7 @@ spec:
               value: "80"
             - name: OUTPUT_SERVICES
               value: '{}'
-      restartPolicy: IfNotPresent
+      restartPolicy: Always
 ---
 apiVersion: v1
 kind: Service

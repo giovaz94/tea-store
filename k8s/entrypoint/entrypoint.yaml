@@ -25,7 +25,7 @@ spec:
               value: "80"
             - name: ENDPOINT
               value: "http://webui-service/request"
-      restartPolicy: IfNotPresent
+      restartPolicy: Always
 ---
 apiVersion: v1
 kind: Service

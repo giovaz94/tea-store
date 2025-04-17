@@ -22,4 +22,4 @@ spec:
           value: "300"
         - name: OUTPUT_SERVICES
           value: '{}'
-  restartPolicy: IfNotPresent
+  restartPolicy: Always
