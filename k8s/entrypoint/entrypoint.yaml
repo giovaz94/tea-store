@@ -17,7 +17,7 @@ spec:
       containers:
         - name: entrypoint
           image: giovaz94/tea-store-ep
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
           env:
@@ -25,7 +25,7 @@ spec:
               value: "80"
             - name: ENDPOINT
               value: "http://webui-service/request"
-      restartPolicy: Always
+      restartPolicy: IfNotPresent
 ---
 apiVersion: v1
 kind: Service

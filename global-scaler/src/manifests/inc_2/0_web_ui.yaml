@@ -8,7 +8,7 @@ spec:
   containers:
     - name: webui
       image: giovaz94/tea-store-general 
-      imagePullPolicy: Always
+      imagePullPolicy: IfNotPresent
       ports:
         - containerPort: 80
       env:
@@ -22,4 +22,4 @@ spec:
           value: "300"
         - name: OUTPUT_SERVICES
           value: '{"http://persistence-service/request":"1", "http://recommender-service/request":"1", "http://image-service/request":"2"}'
-  restartPolicy: Always
+  restartPolicy: IfNotPresent

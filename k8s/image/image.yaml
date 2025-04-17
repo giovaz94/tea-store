@@ -15,7 +15,7 @@ spec:
       containers:
         - name: image
           image: giovaz94/tea-store-general 
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
           env:
@@ -29,7 +29,7 @@ spec:
               value: "80"
             - name: OUTPUT_SERVICES
               value: '{}'
-      restartPolicy: Always
+      restartPolicy: IfNotPresent
 ---
 apiVersion: v1
 kind: Service
