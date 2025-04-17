@@ -64,7 +64,8 @@ if __name__ == '__main__':
             if iter <= 200: req.append(tot)
 
             if iter > 0 and should_scale(target_workload, current_mcl):
-                target_instances = max(math.ceil((K_BIG + target_workload)/COMPONENT_MCL),starting_instances)
+                inc = K_BIG * COMPONENT_MF
+                target_instances = max(math.ceil((inc + target_workload)/COMPONENT_MCL),starting_instances)
                 if target_instances != number_of_instances:
                     number_of_instances = target_instances
                     el.call_soon_threadsafe(lambda replicas=target_instances: k8s_client.patch_namespaced_deployment_scale(name=MANIFEST_NAME, namespace="default", body={'spec': {'replicas': replicas}}))
