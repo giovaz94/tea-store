@@ -73,8 +73,17 @@ if(serviceName !== "recommender") {
 }
 
 const webuiTask = async (task: Task) => {
-  let response = await axios.post("http://auth-service/request");
+
+  let response;
   let executions = Math.floor(Math.random() * 5) + 1;
+
+  try {
+    response = await axios.post("http://auth-service/request");
+  } catch(error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown Error";
+    console.error(`Error sending request to http://auth-service/request: ${errorMessage}`);
+  }
+  
   console.log("Browsing " + executions + " times");
   while (executions > 0 && response.status !== 500) {
     for (const [url, numberOfRequests] of outputServices.entries()) {
