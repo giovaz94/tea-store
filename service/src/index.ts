@@ -37,9 +37,9 @@ function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
   if (queue.length >= max_queue_size) {
     console.log("-------req loss---------");
     lostMessage.inc(); 
+    next();
     res.status(500);
   } else {
-    if (serviceName === "webUI") res.sendStatus(200);
     const arrivalTime = Date.now(); 
     const ready = new Promise<Task>((resolve) => {
       const task: Task = {
@@ -67,7 +67,7 @@ if(serviceName !== "recommender") {
     app.post("/request", rateLimitMiddleware, async (_req: Request, res: Response) => {
       try {
         console.log("Req parsed");
-        if (serviceName !== "webUI") res.sendStatus(200);
+        res.sendStatus(200);
       } catch (err) {
         console.error("Error handling /request:", err);
         res.sendStatus(500);
