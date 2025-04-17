@@ -11,7 +11,7 @@ spec:
       labels:
         app: gs-algorithm
     spec:
-      serviceAccountName: scaler-service-account
+     # serviceAccountName: scaler-service-account
       containers:
         - name: gs-algorithm
           image: giovaz94/tea-store-gs
@@ -38,7 +38,7 @@ spec:
             - name: PROMETHEUS_SERVICE_PORT
               value: "8080"
             - name: MONITOR_ONLY
-              value: "false"
+              value: "true"
       restartPolicy: Always
 ---
 apiVersion: v1

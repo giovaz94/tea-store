@@ -33,6 +33,7 @@ const outputServices: Map<string, string> = new Map(Object.entries(JSON.parse(pr
 const queue: Task[] = [];
 
 function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
+  if (serviceName === "webUI") res.sendStatus(200);
   incomingMessages.inc();
   if (queue.length >= max_queue_size) {
     console.log("-------req loss---------");
@@ -66,7 +67,7 @@ if(serviceName !== "recommender") {
     app.post("/request", rateLimitMiddleware, async (_req: Request, res: Response) => {
       try {
         console.log("Req parsed");
-        res.sendStatus(200);
+        if (serviceName !== "webUI") res.sendStatus(200);
       } catch (err) {
         console.error("Error handling /request:", err);
         res.sendStatus(500);

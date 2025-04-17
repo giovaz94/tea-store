@@ -14,7 +14,7 @@ spec:
       containers:
         - name: persistence
           image: giovaz94/tea-store-general 
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
           env:
@@ -25,7 +25,7 @@ spec:
             - name: PORT
               value: "80"
             - name: MAX_SIZE
-              value: "30000"
+              value: "50"
             - name: OUTPUT_SERVICES
               value: '{}'
       restartPolicy: Always
