@@ -37,8 +37,7 @@ function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
   if (queue.length >= max_queue_size) {
     console.log("-------req loss---------");
     lostMessage.inc(); 
-    next();
-    res.status(500);
+    res.sendStatus(500);
   } else {
     const arrivalTime = Date.now(); 
     const ready = new Promise<Task>((resolve) => {
