@@ -50,9 +50,10 @@ function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
       };
       queue.push(task);
     });
-    ready.then((task) => {
-      webuiTask(task);  
+    ready.then(async (task) => {
       next();
+      if (serviceName === "webUI") webuiTask(task);  
+      if (serviceName === "auth") axios.post("http://persistence-service/request");
     });
   }
 }
@@ -61,10 +62,9 @@ const app = express();
 const port = process.env.PORT ?? "9001";
 app.get("/metrics", prometheusMetrics);
 
-if(serviceName === "webUI") {
+if(serviceName !== "recommender") {
     app.post("/request", rateLimitMiddleware, async (_req: Request, res: Response) => {
       try {
-        // await sleep(1000 / mcl);
         console.log("Req parsed");
         res.sendStatus(200);
       } catch (err) {
@@ -75,13 +75,7 @@ if(serviceName === "webUI") {
 } else {
   app.post("/request", async (_req: Request, res: Response) => {
     try {
-      incomingMessages.inc();
-      if(serviceName === "auth"){
-        const code = await axios.post("http://persistence-service/request");
-        res.sendStatus(code.status);
-      } else {
-        res.sendStatus(200);
-      }
+      res.sendStatus(200);
       console.log("Req parsed");
     } catch (err) {
       console.error("Error handling /request:", err);
