@@ -59,7 +59,7 @@ if __name__ == '__main__':
             print("Checking the system...", flush=True)
             res = prometheus_instance.custom_query(f"sum(increase({METRIC_NAME}[10s]))")
             tot = float(res[0]['value'][1])
-            target_workload = tot
+            target_workload = tot / SLEEP_TIME
             print(target_workload)
             if iter <= 200: req.append(tot)
 
