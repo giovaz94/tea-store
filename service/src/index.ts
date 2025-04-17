@@ -107,11 +107,11 @@ const webuiTask = async (task: Task) => {
 };
 
 setInterval(() => {
-  const task = queue.shift();
-  if (task) {
-    task.resolve(task);
+  for (let i = 0; i < mcl; i++) {
+    const task = queue.shift();
+    if (task) task.resolve(task);
   }
-}, 1000 / mcl);
+}, 1000);
 
 
 const server = app.listen(port, () => {
