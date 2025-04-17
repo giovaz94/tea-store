@@ -80,16 +80,17 @@ function sleep(ms: number) {
 }
 
 const webuiTask = async (task: Task) => {
-  await axios.post("http://auth-service/request");
+  let response = await axios.post("http://auth-service/request");
   let executions = Math.floor(Math.random() * 5) + 1;
   console.log("Browsing " + executions + " times");
-  while (executions > 0) {
+  while (executions > 0 && response.status !== 500) {
     for (const [url, numberOfRequests] of outputServices.entries()) {
       const n = parseInt(numberOfRequests, 10);
       console.log(`Sending ${n} requests to ${url}`);
       for (let i = 0; i < n; i++) {
         try {
-          await axios.post(url);
+          response = await axios.post(url);
+          if (response.status === 500) break;
         } catch (error: unknown) {
           const errorMessage = error instanceof Error ? error.message : "Unknown Error";
           console.error(`Error sending request to ${url}: ${errorMessage}`);
