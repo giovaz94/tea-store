@@ -96,8 +96,8 @@ app.post('/start', (req: Request, res: Response) => {
                         console.error(`Generic Error: ${error}`);
                     }
                 });
-                await new Promise(resolve => setTimeout(resolve, 1000/r));   
             }
+            await new Promise(resolve => setTimeout(resolve, 1000));   
         }
     })();
     return res.status(201).send("Start simulation...");
