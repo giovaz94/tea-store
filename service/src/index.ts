@@ -34,48 +34,62 @@ const queue: Task[] = [];
 
 function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
   incomingMessages.inc();
-  if(serviceName !== "recommender") {
-    if (queue.length >= max_queue_size) {
-      console.log("-------req loss---------");
-      lostMessage.inc(); 
-      res.status(500);
-    } else {
-      const arrivalTime = Date.now(); 
-      const ready = new Promise<Task>((resolve) => {
-        const task: Task = {
-          req,
-          res,
-          next,
-          arrivalTime,
-          resolve: (task) => resolve(task),
-        };
-        queue.push(task);
-      });
-      ready.then((task) => {
-        if (serviceName === "webUI") {
-          webuiTask(task);  
-        } else if (serviceName === "auth") {
-          axios.post("http://persistence-service/request");
-        }
-        next();
-      });
-    }
-  }  
+  if (queue.length >= max_queue_size) {
+    console.log("-------req loss---------");
+    lostMessage.inc(); 
+    res.status(500);
+  } else {
+    const arrivalTime = Date.now(); 
+    const ready = new Promise<Task>((resolve) => {
+      const task: Task = {
+        req,
+        res,
+        next,
+        arrivalTime,
+        resolve: (task) => resolve(task),
+      };
+      queue.push(task);
+    });
+    ready.then((task) => {
+      if (serviceName === "webUI") {
+        webuiTask(task);  
+      } else if (serviceName === "auth") {
+        axios.post("http://persistence-service/request");
+      }
+      next();
+    });
+  }
 }
 
 const app = express();
 const port = process.env.PORT ?? "9001";
 app.get("/metrics", prometheusMetrics);
-app.post("/request", rateLimitMiddleware, async (_req: Request, res: Response) => {
-  try {
-    // await sleep(1000 / mcl);
-    console.log("Req parsed");
-    res.sendStatus(200);
-  } catch (err) {
-    console.error("Error handling /request:", err);
-    res.sendStatus(500);
-  }
-});
+
+if(serviceName === "recommender") {
+  app.post("/request", async (_req: Request, res: Response) => {
+    try {
+      // await sleep(1000 / mcl);
+      console.log("Req parsed");
+      res.sendStatus(200);
+    } catch (err) {
+      console.error("Error handling /request:", err);
+      res.sendStatus(500);
+    }
+  });
+} else {
+    app.post("/request", rateLimitMiddleware, async (_req: Request, res: Response) => {
+      try {
+        // await sleep(1000 / mcl);
+        console.log("Req parsed");
+        res.sendStatus(200);
+      } catch (err) {
+        console.error("Error handling /request:", err);
+        res.sendStatus(500);
+      }
+    });
+}
+
+
 
 
 function sleep(ms: number) {
