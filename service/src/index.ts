@@ -80,6 +80,9 @@ if(serviceName === "recommender") {
     app.post("/request", rateLimitMiddleware, async (_req: Request, res: Response) => {
       try {
         // await sleep(1000 / mcl);
+        if(serviceName === "auth"){
+          await axios.post("http://persistence-service/request");
+        }
         console.log("Req parsed");
         res.sendStatus(200);
       } catch (err) {
