@@ -27,7 +27,7 @@ spec:
             - name: COMPONENT_MF
               value: "6"
             - name: K_BIG
-              value: "60"
+              value: "10"
             - name: K
               value: "5"
             - name: IN_CLUSTER
