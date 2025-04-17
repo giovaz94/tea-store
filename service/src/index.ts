@@ -35,6 +35,7 @@ const queue: Task[] = [];
 function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
   incomingMessages.inc();
   if (queue.length >= max_queue_size) {
+    console.log("-------req loss---------");
     lostMessage.inc(); 
     res.status(500);
   } else {
