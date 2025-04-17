@@ -33,13 +33,13 @@ const outputServices: Map<string, string> = new Map(Object.entries(JSON.parse(pr
 const queue: Task[] = [];
 
 function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
-  if (serviceName === "webUI") res.sendStatus(200);
   incomingMessages.inc();
   if (queue.length >= max_queue_size) {
     console.log("-------req loss---------");
     lostMessage.inc(); 
     res.status(500);
   } else {
+    if (serviceName === "webUI") res.sendStatus(200);
     const arrivalTime = Date.now(); 
     const ready = new Promise<Task>((resolve) => {
       const task: Task = {
