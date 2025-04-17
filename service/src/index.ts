@@ -113,10 +113,12 @@ const webuiTask = async (task: Task) => {
       }
     executions--;
   }
-  const stop = Date.now();
-  const duration = stop - task.arrivalTime;
-  behaviourCounter.inc();
-  behaviourTimeCounter.inc(duration);
+  if (response.status !== 500) {
+    const stop = Date.now();
+    const duration = stop - task.arrivalTime;
+    behaviourCounter.inc();
+    behaviourTimeCounter.inc(duration);
+  }
 };
 
 
