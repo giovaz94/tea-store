@@ -38,24 +38,20 @@ function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
     console.log("-------req loss---------");
     lostMessage.inc(); 
     res.sendStatus(500);
-  } else {
-    const arrivalTime = Date.now(); 
-    const ready = new Promise<Task>((resolve) => {
-      const task: Task = {
-        req,
-        res,
-        next,
-        arrivalTime,
-        resolve: (task) => resolve(task),
-      };
-      queue.push(task);
-    });
-    ready.then(async (task) => {
-      next();
-      if (serviceName === "webUI") webuiTask(task);  
-      if (serviceName === "auth") axios.post("http://persistence-service/request");
-    });
+    return;
   }
+  const arrivalTime = Date.now(); 
+  const ready = new Promise<Task>((resolve) => {
+    const task: Task = {req, res, next, arrivalTime, resolve: (task) => resolve(task), };
+    queue.push(task);
+  });
+  ready.then(async (task) => {
+    next();
+    if (serviceName === "webUI") webuiTask(task);  
+    if (serviceName === "auth") axios.post("http://persistence-service/request");
+  });
+  console.log("Req parsed");
+  res.sendStatus(200);
 }
 
 const app = express();
@@ -63,20 +59,12 @@ const port = process.env.PORT ?? "9001";
 app.get("/metrics", prometheusMetrics);
 
 if(serviceName !== "recommender") {
-    app.post("/request", rateLimitMiddleware, async (_req: Request, res: Response) => {
-      try {
-        console.log("Req parsed");
-        res.sendStatus(200);
-      } catch (err) {
-        console.error("Error handling /request:", err);
-        res.sendStatus(500);
-      }
-    });
+    app.post("/request", rateLimitMiddleware);
 } else {
   app.post("/request", async (_req: Request, res: Response) => {
     try {
-      res.sendStatus(200);
       console.log("Req parsed");
+      res.sendStatus(200);
     } catch (err) {
       console.error("Error handling /request:", err);
       res.sendStatus(500);
