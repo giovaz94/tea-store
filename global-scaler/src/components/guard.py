@@ -92,7 +92,7 @@ class Guard:
             completed = self._execute_prometheus_query("sum(increase(behaviour_execution[10s]))")
             latency = self._execute_prometheus_query("sum(increase(behaviour_time_execution[10s]))")
             avg_lat = latency/(completed if completed > 0 else 1)
-            loss = self._execute_prometheus_query("sum(increase(message_lost[10s]))")
+            loss = self._execute_prometheus_query("sum(increase(message_lost_webUI[10s]))")
             toPrint = str(iter) + " " + str(avg_lat)
               
 
