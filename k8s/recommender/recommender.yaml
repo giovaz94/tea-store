@@ -14,7 +14,7 @@ spec:
       containers:
         - name: recommender
           image: giovaz94/tea-store-general 
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
           env:

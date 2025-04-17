@@ -51,11 +51,7 @@ function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
       queue.push(task);
     });
     ready.then((task) => {
-      if (serviceName === "webUI") {
-        webuiTask(task);  
-      } else if (serviceName === "auth") {
-        axios.post("http://persistence-service/request");
-      }
+      webuiTask(task);  
       next();
     });
   }
@@ -65,24 +61,10 @@ const app = express();
 const port = process.env.PORT ?? "9001";
 app.get("/metrics", prometheusMetrics);
 
-if(serviceName === "recommender") {
-  app.post("/request", async (_req: Request, res: Response) => {
-    try {
-      // await sleep(1000 / mcl);
-      console.log("Req parsed");
-      res.sendStatus(200);
-    } catch (err) {
-      console.error("Error handling /request:", err);
-      res.sendStatus(500);
-    }
-  });
-} else {
+if(serviceName === "webUI") {
     app.post("/request", rateLimitMiddleware, async (_req: Request, res: Response) => {
       try {
         // await sleep(1000 / mcl);
-        if(serviceName === "auth"){
-          await axios.post("http://persistence-service/request");
-        }
         console.log("Req parsed");
         res.sendStatus(200);
       } catch (err) {
@@ -90,13 +72,22 @@ if(serviceName === "recommender") {
         res.sendStatus(500);
       }
     });
-}
-
-
-
-
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+} else {
+  app.post("/request", async (_req: Request, res: Response) => {
+    try {
+      // await sleep(1000 / mcl);
+      if(serviceName === "auth"){
+        const code = await axios.post("http://persistence-service/request");
+        res.sendStatus(code.status);
+      } else {
+        res.sendStatus(200);
+      }
+      console.log("Req parsed");
+    } catch (err) {
+      console.error("Error handling /request:", err);
+      res.sendStatus(500);
+    }
+  });
 }
 
 const webuiTask = async (task: Task) => {
@@ -110,7 +101,10 @@ const webuiTask = async (task: Task) => {
       for (let i = 0; i < n; i++) {
         try {
           response = await axios.post(url);
-          if (response.status === 500) break;
+          if (response.status === 500 && serviceName === "webUI") {
+            lostMessage.inc(); 
+            break;
+          }
         } catch (error: unknown) {
           const errorMessage = error instanceof Error ? error.message : "Unknown Error";
           console.error(`Error sending request to ${url}: ${errorMessage}`);
