@@ -48,7 +48,7 @@ function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
   ready.then(async (task) => {
     next();
     if (serviceName === "webUI") webuiTask(task);  
-    if (serviceName === "auth") axios.post("http://persistence-service/request");
+    if (serviceName === "auth") axios.post("http://persistence-service/request").catch(err => console.log(err.message));
   });
   console.log("Req parsed");
   res.sendStatus(200);
@@ -58,8 +58,8 @@ const app = express();
 const port = process.env.PORT ?? "9001";
 app.get("/metrics", prometheusMetrics);
 
-if(serviceName !== "recommender") {
-    app.post("/request", rateLimitMiddleware);
+if(serviceName !== "recommender") {  
+  app.post("/request", rateLimitMiddleware);
 } else {
   app.post("/request", async (_req: Request, res: Response) => {
     try {
