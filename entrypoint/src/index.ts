@@ -1,6 +1,5 @@
 import express, {Request, Response , Application } from 'express';
 import axios from "axios";
-import * as prometheus from 'prom-client';
 
 const app: Application = express();
 const port: string | 8010 = process.env.PORT || 8010;
