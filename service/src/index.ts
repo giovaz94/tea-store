@@ -34,31 +34,33 @@ const queue: Task[] = [];
 
 function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
   incomingMessages.inc();
-  if (queue.length >= max_queue_size) {
-    console.log("-------req loss---------");
-    lostMessage.inc(); 
-    res.status(500);
-  } else {
-    const arrivalTime = Date.now(); 
-    const ready = new Promise<Task>((resolve) => {
-      const task: Task = {
-        req,
-        res,
-        next,
-        arrivalTime,
-        resolve: (task) => resolve(task),
-      };
-      queue.push(task);
-    });
-    ready.then((task) => {
-      if (serviceName === "webUI") {
-        webuiTask(task);  
-      } else if (serviceName === "auth") {
-        axios.post("http://persistence-service/request");
-      }
-      next();
-    });
-  }
+  if(serviceName !== "recommender") {
+    if (queue.length >= max_queue_size) {
+      console.log("-------req loss---------");
+      lostMessage.inc(); 
+      res.status(500);
+    } else {
+      const arrivalTime = Date.now(); 
+      const ready = new Promise<Task>((resolve) => {
+        const task: Task = {
+          req,
+          res,
+          next,
+          arrivalTime,
+          resolve: (task) => resolve(task),
+        };
+        queue.push(task);
+      });
+      ready.then((task) => {
+        if (serviceName === "webUI") {
+          webuiTask(task);  
+        } else if (serviceName === "auth") {
+          axios.post("http://persistence-service/request");
+        }
+        next();
+      });
+    }
+  }  
 }
 
 const app = express();
@@ -106,12 +108,16 @@ const webuiTask = async (task: Task) => {
   behaviourTimeCounter.inc(duration);
 };
 
-setInterval(() => {
-  for (let i = 0; i < mcl; i++) {
+
+if(serviceName !== "recommender") {
+  setInterval(() => {
     const task = queue.shift();
-    if (task) task.resolve(task);
-  }
-}, 1000);
+    if (task) {
+      task.resolve(task);
+    }
+  }, 1000 / mcl);
+}
+
 
 
 const server = app.listen(port, () => {
