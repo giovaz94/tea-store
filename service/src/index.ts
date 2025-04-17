@@ -79,36 +79,30 @@ const webuiTask = async (task: Task) => {
 
   try {
     response = await axios.post("http://auth-service/request");
-  } catch(error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : "Unknown Error";
-    console.error(`Error sending request to http://auth-service/request: ${errorMessage}`);
-  }
-  
-  console.log("Browsing " + executions + " times");
-  while (executions > 0 && response.status !== 500) {
-    for (const [url, numberOfRequests] of outputServices.entries()) {
-      const n = parseInt(numberOfRequests, 10);
-      console.log(`Sending ${n} requests to ${url}`);
-      for (let i = 0; i < n; i++) {
-        try {
+    console.log("Browsing " + executions + " times");
+    while (executions > 0 && response.status !== 500) {
+      for (const [url, numberOfRequests] of outputServices.entries()) {
+        const n = parseInt(numberOfRequests, 10);
+        console.log(`Sending ${n} requests to ${url}`);
+        for (let i = 0; i < n; i++) {
           response = await axios.post(url);
           if (response.status === 500 && serviceName === "webUI") {
             lostMessage.inc(); 
             break;
           }
-        } catch (error: unknown) {
-          const errorMessage = error instanceof Error ? error.message : "Unknown Error";
-          console.error(`Error sending request to ${url}: ${errorMessage}`);
-          }
         }
       }
     executions--;
   }
-  if (response.status !== 500) {
-    const stop = Date.now();
-    const duration = stop - task.arrivalTime;
-    behaviourCounter.inc();
-    behaviourTimeCounter.inc(duration);
+    if (response.status !== 500) {
+      const stop = Date.now();
+      const duration = stop - task.arrivalTime;
+      behaviourCounter.inc();
+      behaviourTimeCounter.inc(duration);
+    }
+  } catch(error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown Error";
+    console.error(`Error sending request to http://auth-service/request: ${errorMessage}`);
   }
 };
 
