@@ -1,9 +1,9 @@
 import express, {Request, Response , Application } from 'express';
-import axios from "axios";
+import { request } from 'undici';
 
 const app: Application = express();
 const port: string | 8010 = process.env.PORT || 8010;
-const url: string = process.env.ENDPOINT || "localhost";
+const url: string = process.env.ENDPOINT || "http://100.66.83.79:31000/request";
 
 //enron standard
 const workload = [
@@ -149,16 +149,7 @@ app.post('/start', (req: Request, res: Response) => {
             const r = workload[index++];
             console.log(`Sending ${r} requests per second`);
             for (let i = 0; i < r; i++) {
-                axios.post(url).catch((error) => {
-                    if (axios.isAxiosError(error)) {
-                        console.error(`Request error ${url}: ${error.message}`);
-                        if (error.response) {
-                            console.error(`Status code: ${error.response.status}`);
-                        }
-                    } else {
-                        console.error(`Generic Error: ${error}`);
-                    }
-                });
+                request(url, { method: 'POST',}).catch(err => console.log(err.message));
             }
             await new Promise(resolve => setTimeout(resolve, 1000));   
         }

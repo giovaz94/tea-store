@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: webui
-          image: giovaz94/tea-store-general 
+          image: giovaz94/tea-store-general
           imagePullPolicy: Always
           ports:
             - containerPort: 80
@@ -28,19 +28,15 @@ spec:
               value: "200"
             - name: OUTPUT_SERVICES
               value: '{"http://persistence-service/request":"1", "http://recommender-service/request":"1", "http://image-service/request":"2"}'
+          resources:
+            requests:
+              memory: "150Mi"  
+              cpu: "150m"    
+            limits:
+              memory: "300Mi" 
+              cpu: "300m"  
       restartPolicy: Always
 ---
-# apiVersion: v1
-# kind: Service
-# metadata:
-#   name: webui-service
-# spec:
-#   selector:
-#     app: webui
-#   ports:
-#     - protocol: TCP
-#       port: 8001
-#       targetPort: 8001
 apiVersion: v1
 kind: Service
 metadata:
@@ -58,4 +54,3 @@ spec:
       port: 80
       targetPort: 80
       nodePort: 31000
-
