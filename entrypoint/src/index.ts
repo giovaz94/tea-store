@@ -163,7 +163,7 @@ app.post('/stop', (req: Request, res: Response) => {
 })
 
 const server = app.listen(port, () => {
-    server.keepAliveTimeout = 200;
+    server.keepAliveTimeout = 1000;
     console.log(`Entrypoint launhed ad http://localhost:${port}`);
 });
 
