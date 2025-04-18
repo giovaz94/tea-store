@@ -47,21 +47,21 @@ spec:
   - protocol: TCP
     port: 80
     targetPort: 80
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: persistence-ingress
-  annotations:
-    traefik.ingress.kubernetes.io/load-balancer-method: "drr"
-spec:
-  rules:
-  - http:
-      paths:
-      - path: /persistence
-        pathType: Prefix
-        backend:
-          service:
-            name: persistence-service
-            port:
-              number: 80
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: persistence-ingress
+#   annotations:
+#     traefik.ingress.kubernetes.io/load-balancer-method: "drr"
+# spec:
+#   rules:
+#   - http:
+#       paths:
+#       - path: /persistence
+#         pathType: Prefix
+#         backend:
+#           service:
+#             name: persistence-service
+#             port:
+#               number: 80

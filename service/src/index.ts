@@ -15,9 +15,7 @@ type Task = {
 
 ///PROM METRICS///
 const max_queue_size = parseInt(process.env.MAX_SIZE || "50");
-const keepAliveTimeout = parseInt(process.env.KEEP_ALIVE || "3000");
 const serviceName: string = process.env.SERVICE_NAME || "undefinedService";
-
 const lostMessage = createLostMessageCounter(serviceName);
 const incomingMessages = createIncomingMessageCounter(serviceName);
 let behaviourCounter: Counter<string>;
@@ -53,7 +51,7 @@ function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
   ready.then(async (task) => {
     next();
     if (serviceName === "webUI") await webuiTask(task);
-    if (serviceName === "auth") await request('http://traefik.kube-system.svc.cluster.local/persistence/request', 
+    if (serviceName === "auth") await request('http://persistence-service/request', 
         {method: 'POST',
         }
       ).catch(err => console.log(err.message));
@@ -84,7 +82,7 @@ const webuiTask = async (task: Task) => {
   let response;
   let executions = Math.floor(Math.random() * 5) + 1;
   try {
-    response = await request('http://auth-ingress.default.svc.cluster.local/auth/request', {method: 'POST',}); 
+    response = await request('http://auth-service/request', {method: 'POST',}); 
     //response = await axios.post("http://auth-service/request");
     console.log("Browsing " + executions + " times");
     while (executions > 0 && response.statusCode !== 500) {
@@ -123,6 +121,6 @@ if (serviceName !== "recommender") {
 }
 
 const server = app.listen(port, () => {
-  server.keepAliveTimeout = keepAliveTimeout;
+  server.keepAliveTimeout = 1000;
   console.log(`${serviceName} started and listening on port ${port}`);
 });

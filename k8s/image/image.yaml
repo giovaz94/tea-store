@@ -48,22 +48,22 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: image-ingress
-  annotations:
-    traefik.ingress.kubernetes.io/load-balancer-method: "drr"
-spec:
-  rules:
-  - http:
-      paths:
-      - path: /image
-        pathType: Prefix
-        backend:
-          service:
-            name: image-service
-            port:
-              number: 80
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: image-ingress
+#   annotations:
+#     traefik.ingress.kubernetes.io/load-balancer-method: "drr"
+# spec:
+#   rules:
+#   - http:
+#       paths:
+#       - path: /image
+#         pathType: Prefix
+#         backend:
+#           service:
+#             name: image-service
+#             port:
+#               number: 80
 
