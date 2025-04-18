@@ -35,9 +35,9 @@ let runningTasks = 0;
 
 function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
   incomingMessages.inc();
+  console.log("x-envoy-attempt-count:", req.headers["x-envoy-attempt-count"]);
 
   if (requestQueue.length >= max_queue_size) {
-    console.log("-------req loss---------");
     lostMessage.inc(); 
     res.sendStatus(500);
     return;
