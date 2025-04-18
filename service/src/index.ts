@@ -110,8 +110,4 @@ if (serviceName !== "recommender") {
   }, 1000 / mcl);
 }
 
-const server = app.listen(port, () => {
-  server.keepAliveTimeout = 65000;
-  server.headersTimeout = 66000;
-  console.log(`${serviceName} started and listening on port ${port}`);
-});
+const server = app.listen(port, () => {console.log(`${serviceName} started and listening on port ${port}`);});
