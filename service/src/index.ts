@@ -42,7 +42,7 @@ function isIstioRequest(req) {
     req.headers['x-envoy-peer-metadata'] !== undefined
   );
 }
-function filterIstioMiddleware(req, res, next) {
+function filterIstioMiddleware(req: Request, res: Response, next: NextFunction) {
   if (isIstioRequest(req)) {
     return res.sendStatus(200);
   }
