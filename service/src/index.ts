@@ -2,7 +2,8 @@ import express from "express";
 import { Request, Response, NextFunction } from 'express';
 import { prometheusMetrics, createIncomingMessageCounter, createLostMessageCounter, createBehaviourCounter, createBehaviourTimeCounter } from "#prometheus";
 import { Counter } from "prom-client";
-import axios from "axios";
+// import axios from "axios";
+import { request } from 'undici';
 
 type Task = {
   resolve: (task: Task) => void;
@@ -50,7 +51,8 @@ function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
   ready.then(async (task) => {
     next();
     if (serviceName === "webUI") await webuiTask(task);
-    if (serviceName === "auth") await axios.post("http://persistence-service/request").catch(err => console.log(err.message));
+    if (serviceName === "auth") await request('http://auth-service/request', { method: 'POST',});
+      // await axios.post("http://persistence-service/request").catch(err => console.log(err.message));
     runningTasks--;
   });
   console.log("Req parsed");
@@ -70,15 +72,17 @@ const webuiTask = async (task: Task) => {
   let response;
   let executions = Math.floor(Math.random() * 5) + 1;
   try {
-    response = await axios.post("http://auth-service/request");
+    response = await request('http://auth-service/request', {method: 'POST',}); 
+    // await axios.post("http://auth-service/request");
     console.log("Browsing " + executions + " times");
-    while (executions > 0 && response.status !== 500) {
+    while (executions > 0 && response.statusCode !== 500) {
       for (const [url, numberOfRequests] of outputServices.entries()) {
         const n = parseInt(numberOfRequests, 10);
         console.log(`Sending ${n} requests to ${url}`);
         for (let i = 0; i < n; i++) {
-          response = await axios.post(url);
-          if (response.status === 500 && serviceName === "webUI") {
+          response = await request(url, {method: 'POST',}); 
+          // await axios.post(url);
+          if (response.statusCode === 500 && serviceName === "webUI") {
             lostMessage.inc(); 
             break;
           }
@@ -86,7 +90,7 @@ const webuiTask = async (task: Task) => {
       }
       executions--;
     }
-    if (response.status !== 500) {
+    if (response.statusCode !== 500) {
       behaviourCounter.inc();
       behaviourTimeCounter.inc(Date.now() - task.arrivalTime);
     }
