@@ -29,7 +29,7 @@ spec:
         - name: MAX_SIZE
           value: "200"
         - name: OUTPUT_SERVICES
-          value: '{"http://persistence-ingress.default.svc.cluster.local/persistence/request":"1", "http://recommender-ingress.default.svc.cluster.local/recommender/request":"1", "http://image-ingress.default.svc.cluster.local/image/request":"2"}'
+          value: '{"http://persistence-service/request":"1", "http://recommender-service/request":"1", "http://image-service/request":"2"}'
       restartPolicy: Always
 ---
 apiVersion: v1

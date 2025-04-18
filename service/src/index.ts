@@ -84,7 +84,7 @@ const webuiTask = async (task: Task) => {
   let response;
   let executions = Math.floor(Math.random() * 5) + 1;
   try {
-    response = await request('http://traefik.kube-system.svc.cluster.local/auth/request', {method: 'POST',}); 
+    response = await request('http://auth-ingress.default.svc.cluster.local/auth/request', {method: 'POST',}); 
     //response = await axios.post("http://auth-service/request");
     console.log("Browsing " + executions + " times");
     while (executions > 0 && response.statusCode !== 500) {

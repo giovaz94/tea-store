@@ -29,7 +29,7 @@ spec:
             - name: MAX_SIZE
               value: "200"
             - name: OUTPUT_SERVICES
-              value: '{"http://persistence-ingress.default.svc.cluster.local/persistence/request":"1"}' 
+              value: '{"http://traefik.default.svc.cluster.local/persistence/request":"1"}' 
       restartPolicy: Always
 ---
 apiVersion: v1
@@ -53,7 +53,8 @@ kind: Ingress
 metadata:
   name: auth-ingress
   annotations:
-    traefik.ingress.kubernetes.io/load-balancer-method: "drr"
+    traefik.ingress.kubernetes.io/load-balancer-method: "drr" 
+    traefik.ingress.kubernetes.io/ingress.class: "traefik" 
 spec:
   rules:
   - http:
@@ -65,4 +66,5 @@ spec:
             name: auth-service
             port:
               number: 80
+
 
