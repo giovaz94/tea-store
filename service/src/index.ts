@@ -33,7 +33,7 @@ const outputServices: Map<string, string> = new Map(Object.entries(JSON.parse(pr
 const requestQueue: Task[] = [];
 let runningTasks = 0;
 
-function isIstioRequest(req) {
+function isIstioRequest(req: Request) {
   return (
     req.headers['x-istio-attributes'] !== undefined || 
     req.headers['x-envoy-attempt-count'] !== undefined ||
