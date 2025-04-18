@@ -53,7 +53,7 @@ function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
   ready.then(async (task) => {
     next();
     if (serviceName === "webUI") await webuiTask(task);
-    if (serviceName === "auth") await request('http://persistence-service/request', 
+    if (serviceName === "auth") await request('http://traefik.kube-system.svc.cluster.local/persistence/request', 
         {method: 'POST',
         }
       ).catch(err => console.log(err.message));
@@ -84,7 +84,7 @@ const webuiTask = async (task: Task) => {
   let response;
   let executions = Math.floor(Math.random() * 5) + 1;
   try {
-    response = await request('http://auth-service/request', {method: 'POST',}); 
+    response = await request('http://traefik.kube-system.svc.cluster.local/auth/request', {method: 'POST',}); 
     //response = await axios.post("http://auth-service/request");
     console.log("Browsing " + executions + " times");
     while (executions > 0 && response.statusCode !== 500) {

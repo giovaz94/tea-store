@@ -3,7 +3,7 @@ import { request } from 'undici';
 
 const app: Application = express();
 const port: string | 8010 = process.env.PORT || 8010;
-const url: string = process.env.ENDPOINT || "http://100.66.83.79:31000/request";
+const url: string = process.env.ENDPOINT || "http://100.66.83.79/request";
 
 //enron standard
 const workload = [

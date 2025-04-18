@@ -31,13 +31,6 @@ spec:
               value: "80"
             - name: OUTPUT_SERVICES
               value: '{}'
-          resources:
-            requests:
-              memory: "300Mi"  
-              cpu: "300m"    
-            limits:
-              memory: "600Mi" 
-              cpu: "600m"  
       restartPolicy: Always
 ---
 apiVersion: v1
@@ -55,4 +48,22 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: image-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/load-balancer-method: "drr"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /image
+        pathType: Prefix
+        backend:
+          service:
+            name: image-service
+            port:
+              number: 80
 
