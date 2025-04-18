@@ -15,7 +15,9 @@ type Task = {
 
 ///PROM METRICS///
 const max_queue_size = parseInt(process.env.MAX_SIZE || "50");
+const keepAliveTimeout = parseInt(process.env.KEEP_ALIVE || "3000");
 const serviceName: string = process.env.SERVICE_NAME || "undefinedService";
+
 const lostMessage = createLostMessageCounter(serviceName);
 const incomingMessages = createIncomingMessageCounter(serviceName);
 let behaviourCounter: Counter<string>;
@@ -121,6 +123,6 @@ if (serviceName !== "recommender") {
 }
 
 const server = app.listen(port, () => {
-  server.keepAliveTimeout = 1000;
+  server.keepAliveTimeout = keepAliveTimeout;
   console.log(`${serviceName} started and listening on port ${port}`);
 });

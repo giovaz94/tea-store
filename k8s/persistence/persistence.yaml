@@ -24,6 +24,8 @@ spec:
               value: "persistence"
             - name: PORT
               value: "80"
+            - name: KEEP_ALIVE
+              value: "2000"
             - name: MAX_SIZE
               value: "200"
             - name: OUTPUT_SERVICES
