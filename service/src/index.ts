@@ -28,7 +28,7 @@ if (serviceName === "webUI") {
 
 if (process.env.MCL === undefined) throw new Error("The MCL for the following service isn't defined");
 const mcl: number = parseInt(process.env.MCL as string, 10);
-const maxConcurrentTasks = parseInt(process.env.MAX_CONCURRENCY || process.env.MCL);
+const maxConcurrentTasks = parseInt(process.env.MAX_CONCURRENCY || "1000");
 const outputServices: Map<string, string> = new Map(Object.entries(JSON.parse(process.env.OUTPUT_SERVICES || "{}")),);
 const requestQueue: Task[] = [];
 let runningTasks = 0;
