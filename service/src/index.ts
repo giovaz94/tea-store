@@ -86,6 +86,7 @@ function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
 const app = express();
 const port = process.env.PORT ?? "9001";
 
+//@ts-ignore
 app.use(filterIstioMiddleware);
 app.get("/metrics", prometheusMetrics);
 if(serviceName !== "recommender") {  
