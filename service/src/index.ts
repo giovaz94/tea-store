@@ -25,30 +25,33 @@ if (serviceName === "webUI") {
 }
 ////////////////
 
-if (process.env.MCL === undefined) {
-  throw new Error("The MCL for the following service isn't defined");
-}
+if (process.env.MCL === undefined) throw new Error("The MCL for the following service isn't defined");
 const mcl: number = parseInt(process.env.MCL as string, 10);
+const maxConcurrentTasks = parseInt(process.env.MAX_CONCURRENCY || "10");
 const outputServices: Map<string, string> = new Map(Object.entries(JSON.parse(process.env.OUTPUT_SERVICES || "{}")),);
-const queue: Task[] = [];
+const requestQueue: Task[] = [];
+let runningTasks = 0;
 
 function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
   incomingMessages.inc();
-  if (queue.length >= max_queue_size) {
+
+  if (requestQueue.length >= max_queue_size) {
     console.log("-------req loss---------");
     lostMessage.inc(); 
     res.sendStatus(500);
     return;
   }
+
   const arrivalTime = Date.now(); 
   const ready = new Promise<Task>((resolve) => {
     const task: Task = {req, res, next, arrivalTime, resolve: (task) => resolve(task), };
-    queue.push(task);
+    requestQueue.push(task);
   });
   ready.then(async (task) => {
     next();
-    if (serviceName === "webUI") webuiTask(task);  
-    if (serviceName === "auth") axios.post("http://persistence-service/request").catch(err => console.log(err.message));
+    if (serviceName === "webUI") await webuiTask(task);
+    if (serviceName === "auth") await axios.post("http://persistence-service/request").catch(err => console.log(err.message));
+    runningTasks--;
   });
   console.log("Req parsed");
   res.sendStatus(200);
@@ -57,26 +60,15 @@ function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
 const app = express();
 const port = process.env.PORT ?? "9001";
 app.get("/metrics", prometheusMetrics);
-
 if(serviceName !== "recommender") {  
   app.post("/request", rateLimitMiddleware);
 } else {
-  app.post("/request", async (_req: Request, res: Response) => {
-    try {
-      console.log("Req parsed");
-      res.sendStatus(200);
-    } catch (err) {
-      console.error("Error handling /request:", err);
-      res.sendStatus(500);
-    }
-  });
+  app.post("/request", async (_req: Request, res: Response) => { res.sendStatus(200) });
 }
 
 const webuiTask = async (task: Task) => {
-
   let response;
   let executions = Math.floor(Math.random() * 5) + 1;
-
   try {
     response = await axios.post("http://auth-service/request");
     console.log("Browsing " + executions + " times");
@@ -89,34 +81,30 @@ const webuiTask = async (task: Task) => {
           if (response.status === 500 && serviceName === "webUI") {
             lostMessage.inc(); 
             break;
+          }
         }
       }
+      executions--;
     }
-    executions--;
-  }
     if (response.status !== 500) {
-      const stop = Date.now();
-      const duration = stop - task.arrivalTime;
       behaviourCounter.inc();
-      behaviourTimeCounter.inc(duration);
+      behaviourTimeCounter.inc(Date.now() - task.arrivalTime);
     }
   } catch(error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : "Unknown Error";
-    console.error(`Error sending request to http://auth-service/request: ${errorMessage}`);
+    console.error(`${error instanceof Error ? error.message : "Unknown Error"}`);
   }
 };
 
-
-if(serviceName !== "recommender") {
+if (serviceName !== "recommender") {
   setInterval(() => {
-    const task = queue.shift();
+    if (runningTasks >= maxConcurrentTasks) return;
+    const task = requestQueue.shift();
     if (task) {
+      runningTasks++;
       task.resolve(task);
     }
   }, 1000 / mcl);
 }
-
-
 
 const server = app.listen(port, () => {
   server.keepAliveTimeout = 65000;
