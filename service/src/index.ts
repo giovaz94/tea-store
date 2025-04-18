@@ -33,10 +33,24 @@ const outputServices: Map<string, string> = new Map(Object.entries(JSON.parse(pr
 const requestQueue: Task[] = [];
 let runningTasks = 0;
 
-function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
-  incomingMessages.inc();
-  console.log("x-envoy-attempt-count:", req.headers["x-envoy-attempt-count"]);
+function isIstioRequest(req) {
+  return (
+    req.headers['x-istio-attributes'] !== undefined || 
+    req.headers['x-envoy-attempt-count'] !== undefined ||
+    req.headers['x-request-id']?.includes('istio') ||
+    req.headers['x-envoy-decorator-operation'] !== undefined ||
+    req.headers['x-envoy-peer-metadata'] !== undefined
+  );
+}
+function filterIstioMiddleware(req, res, next) {
+  if (isIstioRequest(req)) {
+    return res.sendStatus(200);
+  }
+  next();
+}
 
+
+function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
   if (requestQueue.length >= max_queue_size) {
     lostMessage.inc(); 
     res.sendStatus(500);
@@ -71,6 +85,8 @@ function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
 
 const app = express();
 const port = process.env.PORT ?? "9001";
+
+app.use(filterIstioMiddleware);
 app.get("/metrics", prometheusMetrics);
 if(serviceName !== "recommender") {  
   app.post("/request", rateLimitMiddleware);
