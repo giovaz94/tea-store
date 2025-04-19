@@ -56,7 +56,7 @@ metadata:
   name: eta-checker
   namespace: default
 spec:
-  schedule: "*/1 * * * *"  # Run every 1 minute — adjust as needed
+  schedule: "*/2 * * * *"  # Run every 1 minute — adjust as needed
   jobTemplate:
     spec:
       template:
