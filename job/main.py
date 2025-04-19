@@ -66,30 +66,14 @@ def main():
         if all_eta_above_30:
             for p in candidate_pods:        
                 patch_label(p.metadata.namespace, p.metadata.name, "new", "true")
+            continue
 
  
-        has_eta_below_al = False
         for pod in candidate_pods:
             eta_seconds = get_eta_seconds(pod)
-            if eta_seconds is not None and eta_seconds < pod_age_limit:
-                has_eta_below_al = True
-                break
- 
-        if not has_eta_below_al:
-            for pod in candidate_pods:
-                eta_seconds = get_eta_seconds(pod)
-                if eta_seconds is None or eta_seconds <= pod_age_limit:
-                    continue
-                patch_label(pod.metadata.namespace, pod.metadata.name, "new", "false")
- 
-    # Second pass: restore new:true if ALL pods have new:false
-    for (namespace, base_name), group_pods in pod_groups.items():
-        all_new_false = all(p.metadata.labels.get("new") == "false" for p in group_pods)
- 
-        if all_new_false and group_pods:
-            # Pick the first pod and restore new:true
-            pod_to_restore = group_pods[0]
-            patch_label(pod_to_restore.metadata.namespace, pod_to_restore.metadata.name, "new", "true")
+            if eta_seconds is None or eta_seconds <= pod_age_limit:
+                continue
+            patch_label(pod.metadata.namespace, pod.metadata.name, "new", "false")
  
  
 if __name__ == "__main__":
