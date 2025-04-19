@@ -40,6 +40,8 @@ function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
     lostMessage.inc(); 
     res.sendStatus(500);
     return;
+  } else {
+    incomingMessages.inc();
   }
 
   const arrivalTime = Date.now(); 
