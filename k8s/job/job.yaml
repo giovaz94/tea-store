@@ -18,9 +18,9 @@ spec:
           containers:
             - name: eta-checker
               image: giovaz94/tea-store-cj
-              imagePullPolicy: Always
+              imagePullPolicy: IfNotPresent
               env:
                 - name: TZ
                   value: UTC
                 - name: POD_AGE_LIMIT
-                  value: "30"
+                  value: "60"

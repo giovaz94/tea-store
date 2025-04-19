@@ -11,6 +11,8 @@ spec:
     metadata:
       labels:
         app: image
+        new: "true"
+        old: "true"
     spec:
       containers:
         - name: image
@@ -48,22 +50,36 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
-# ---
-# apiVersion: networking.k8s.io/v1
-# kind: Ingress
-# metadata:
-#   name: image-ingress
-#   annotations:
-#     traefik.ingress.kubernetes.io/load-balancer-method: "drr"
-# spec:
-#   rules:
-#   - http:
-#       paths:
-#       - path: /image
-#         pathType: Prefix
-#         backend:
-#           service:
-#             name: image-service
-#             port:
-#               number: 80
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: image-service
+spec:
+  host: image-service
+  subsets:
+    - name: new
+      labels:
+        new: "true"
+    - name: old
+      labels:
+        old: "true"
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: image-service
+spec:
+  hosts:
+    - image-service
+  http:
+    - route:
+        - destination:
+            host: image-service
+            subset: new
+          weight: 70
+        - destination:
+            host: image-service
+            subset: old
+          weight: 30
 

@@ -10,6 +10,8 @@ spec:
     metadata:
       labels:
         app: persistence
+        new: "true"
+        old: "true"
     spec:
       containers:
         - name: persistence
@@ -54,4 +56,38 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: persistence-service
+spec:
+  host: persistence-service
+  subsets:
+    - name: new
+      labels:
+        new: "true"
+    - name: old
+      labels:
+        old: "true"
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: persistence-service
+spec:
+  hosts:
+    - persistence-service
+  http:
+    - route:
+        - destination:
+            host: persistence-service
+            subset: new
+          weight: 70
+        - destination:
+            host: persistence-service
+            subset: old
+          weight: 30
+
+ 
 

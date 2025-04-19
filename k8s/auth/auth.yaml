@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: auth
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: auth
@@ -32,7 +32,7 @@ spec:
             - name: MAX_SIZE
               value: "100000"
             - name: OUTPUT_SERVICES
-              value: '{"http://traefik.default.svc.cluster.local/persistence/request":"1"}' 
+              value: '{"http://persistence-service/request":"1"}' 
       restartPolicy: Always
 ---
 apiVersion: v1
@@ -63,7 +63,7 @@ spec:
         new: "true"
     - name: old
       labels:
-        false: "true"
+        old: "true"
 ---
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService

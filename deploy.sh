@@ -57,6 +57,9 @@ deploy_global() {
 deploy_local() {
   echo -e "${YELLOW}Executing LOCAL deployment...${NC}"
 
+  echo -e "${GREEN}Deploying cronJob...${NC}"
+  kubectl apply -f "$K8S_DIR/job" && check_error
+
   echo -e "${GREEN}Deploying role...${NC}"
   kubectl apply -f "$K8S_DIR/roles" && check_error
   
@@ -93,6 +96,7 @@ deploy_services_only() {
   echo -e "${GREEN}Deploying prometheus...${NC}"
   kubectl apply -f "$K8S_DIR/prometheus" && check_error
 
+
   echo -e "${GREEN}Deploying entrypoint...${NC}"
   kubectl apply -f "$K8S_DIR/entrypoint" && check_error
   
@@ -116,6 +120,9 @@ deploy_services_only() {
 
 undeploy_all() {
   echo -e "${YELLOW}Undeploying all components...${NC}"
+
+  echo -e "${GREEN}Removing cronJob...${NC}"
+  kubectl delete -f "$K8S_DIR/job" && check_error
 
   echo -e "${GREEN}Removing entrypoint...${NC}"
   kubectl delete -f "$K8S_DIR/entrypoint" --ignore-not-found=true
