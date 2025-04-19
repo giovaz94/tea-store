@@ -38,6 +38,7 @@ let runningTasks = 0;
 function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
   incomingMessages.inc();
   if (requestQueue.length >= max_queue_size) {
+    console.log("----message loss----");
     lostMessage.inc(); 
     res.sendStatus(500);
     return;
