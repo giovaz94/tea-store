@@ -49,3 +49,26 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
+--- 
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: eta-checker
+  namespace: default
+spec:
+  schedule: "*/1 * * * *"  # Run every 1 minute — adjust as needed
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: scaler-service-account
+          restartPolicy: OnFailure
+          containers:
+            - name: eta-checker
+              image: giovaz94/tea-store-cj
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: TZ
+                  value: UTC
+
+ 
