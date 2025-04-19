@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: auth
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: auth
@@ -50,6 +50,38 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: auth-service
+spec:
+  host: auth-service
+  subsets:
+    - name: new
+      labels:
+        new: "true"
+    - name: old
+      labels:
+        false: "true"
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: auth-service
+spec:
+  hosts:
+    - auth-service
+  http:
+    - route:
+        - destination:
+            host: auth-service
+            subset: new
+          weight: 70
+        - destination:
+            host: auth-service
+            subset: old
+          weight: 30
 --- 
 apiVersion: batch/v1
 kind: CronJob
@@ -70,11 +102,11 @@ spec:
           containers:
             - name: eta-checker
               image: giovaz94/tea-store-cj
-              imagePullPolicy: IfNotPresent
+              imagePullPolicy: Always
               env:
                 - name: TZ
                   value: UTC
-                - eta:
+                - name: ETA
                   value: "30"
 
  
