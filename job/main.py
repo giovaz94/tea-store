@@ -58,10 +58,15 @@ def main():
  
     # First pass: turn off new:true if no pod in group has eta < 30s
     for (namespace, base_name), group_pods in pod_groups.items():
-        candidate_pods = [
-            p for p in group_pods
-            if p.metadata.labels.get("new") == "true" and p.metadata.labels.get("old") == "true"
-        ]
+        candidate_pods = [p for p in group_pods if p.metadata.labels.get("new") == "true" and p.metadata.labels.get("old") == "true"]
+
+        eta_list = [get_eta_seconds(p) for p in candidate_pods]
+        all_eta_above_30 = all(eta > 30 for eta in eta_list if eta is not None)
+
+        if all_eta_above_30:
+            for p in candidate_pods:        
+                patch_label(p.metadata.namespace, p.metadata.name, "new", "true")
+
  
         has_eta_below_al = False
         for pod in candidate_pods:
