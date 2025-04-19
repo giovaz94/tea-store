@@ -25,9 +25,9 @@ spec:
             - name: PORT
               value: "80"
             - name: MAX_SIZE
-              value: "200"
+              value: "100000"
             - name: KEEP_ALIVE
-              value: "2000"
+              value: "5000"
             - name: OUTPUT_SERVICES
               value: '{}'
       restartPolicy: Always

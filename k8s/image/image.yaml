@@ -24,9 +24,9 @@ spec:
             - name: SERVICE_NAME
               value: "image"
             - name: MAX_SIZE
-              value: "200"
+              value: "100000"
             - name: KEEP_ALIVE
-              value: "2000"
+              value: "5000"
             - name: PORT
               value: "80"
             - name: OUTPUT_SERVICES

@@ -10,6 +10,8 @@ spec:
     metadata:
       labels:
         app: auth
+        new: "true"
+        old: "true"
     spec:
       containers:
         - name: auth
@@ -23,11 +25,11 @@ spec:
             - name: SERVICE_NAME
               value: "auth"
             - name: KEEP_ALIVE
-              value: "2000"
+              value: "5000"
             - name: PORT
               value: "80"
             - name: MAX_SIZE
-              value: "200"
+              value: "100000"
             - name: OUTPUT_SERVICES
               value: '{"http://traefik.default.svc.cluster.local/persistence/request":"1"}' 
       restartPolicy: Always
@@ -47,6 +49,180 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: pod-age-label-manager
+spec:
+  schedule: "*/15 * * * *"  # Run every 15 minutes as a safeguard
+  concurrencyPolicy: Forbid   # Don't start new job if previous is still running
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: pod-label-manager-sa
+          containers:
+          - name: kubectl
+            image: bitnami/kubectl:latest
+            command:
+            - /bin/bash
+            - -c
+            - |
+              # Get your deployment name from environment variable
+              DEPLOYMENT_NAME="${TARGET_DEPLOYMENT}"
+              NAMESPACE="${TARGET_NAMESPACE:-default}"
+              MAX_RUNTIME_MINUTES="${MAX_RUNTIME_MINUTES:-14}"  # Default to just under 15 min to avoid overlap
+              
+              echo "Starting pod label manager for deployment: $DEPLOYMENT_NAME in namespace: $NAMESPACE"
+              echo "Will run for approximately $MAX_RUNTIME_MINUTES minutes with 5-second intervals"
+              
+              # Calculate max iterations based on runtime minutes
+              MAX_ITERATIONS=$((MAX_RUNTIME_MINUTES * 60 / 5))
+              ITERATION=0
+              
+              # Process function to be executed every 5 seconds
+              process_pods() {
+                echo "$(date): Checking pods (iteration $ITERATION/$MAX_ITERATIONS)"
+                
+                # Get all pods for the deployment and their creation timestamps
+                PODS=$(kubectl get pods -n $NAMESPACE -l app=$DEPLOYMENT_NAME -o jsonpath='{range .items[*]}{.metadata.name},{.metadata.creationTimestamp}{"\n"}{end}')
+                
+                # Check if any pod is younger than 30 seconds
+                CURRENT_TIME=$(date +%s)
+                YOUNG_PODS_EXIST=false
+                
+                echo "Current pods:"
+                for POD_INFO in $PODS; do
+                  POD_NAME=$(echo $POD_INFO | cut -d ',' -f1)
+                  CREATION_TIME=$(echo $POD_INFO | cut -d ',' -f2)
+                  
+                  # Convert to seconds since epoch
+                  POD_CREATION_EPOCH=$(date --date="$CREATION_TIME" +%s)
+                  
+                  # Calculate age in seconds
+                  AGE_SECONDS=$((CURRENT_TIME - POD_CREATION_EPOCH))
+                  
+                  echo "Pod: $POD_NAME, Age: $AGE_SECONDS seconds"
+                  
+                  if [ $AGE_SECONDS -le 30 ]; then
+                    YOUNG_PODS_EXIST=true
+                    echo "Pod $POD_NAME is younger than 30 seconds"
+                  else
+                    # Remove 'new' label from pods older than 30 seconds
+                    echo "Removing 'new' label from pod $POD_NAME (age: $AGE_SECONDS seconds)"
+                    kubectl label pods $POD_NAME -n $NAMESPACE new- --overwrite 2>/dev/null || true
+                  fi
+                done
+                
+                # If no young pods exist, relabel all pods with both 'new' and 'old'
+                if [ "$YOUNG_PODS_EXIST" = false ] && [ -n "$PODS" ]; then
+                  echo "No pods younger than 30 seconds found. Re-labeling all pods with 'new' and 'old'"
+                  
+                  for POD_INFO in $PODS; do
+                    POD_NAME=$(echo $POD_INFO | cut -d ',' -f1)
+                    echo "Re-labeling pod $POD_NAME with 'new' and 'old'"
+                    kubectl label pods $POD_NAME -n $NAMESPACE new=true old=true --overwrite
+                  done
+                fi
+              }
+              
+              # Main loop - run every 5 seconds until MAX_ITERATIONS is reached
+              while [ $ITERATION -lt $MAX_ITERATIONS ]; do
+                process_pods
+                ITERATION=$((ITERATION + 1))
+                
+                # Only sleep if not the last iteration
+                if [ $ITERATION -lt $MAX_ITERATIONS ]; then
+                  sleep 5
+                fi
+              done
+              
+              echo "Job completed after $ITERATION iterations"
+            env:
+            - name: TARGET_DEPLOYMENT
+              value: "auth"  
+            - name: TARGET_NAMESPACE
+              value: "default"
+            - name: MAX_RUNTIME_MINUTES
+              value: "14"  
+          restartPolicy: OnFailure
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pod-age-label-manager-immediate
+spec:
+  template:
+    spec:
+      serviceAccountName: pod-label-manager-sa
+      containers:
+      - name: kubectl
+        image: bitnami/kubectl:latest
+        command:
+          - /bin/bash
+          - -c
+          - |
+            # Usa la stessa configurazione del CronJob
+            DEPLOYMENT_NAME="auth"
+            NAMESPACE="default"
+            
+            echo "Executing immediate pod label management for deployment: $DEPLOYMENT_NAME"
+            
+            # Funzione di processo uguale a quella del CronJob
+            PODS=$(kubectl get pods -n $NAMESPACE -l app=$DEPLOYMENT_NAME -o jsonpath='{range .items[*]}{.metadata.name},{.metadata.creationTimestamp}{"\n"}{end}')
+            
+            CURRENT_TIME=$(date +%s)
+            YOUNG_PODS_EXIST=false
+            
+            for POD_INFO in $PODS; do
+              POD_NAME=$(echo $POD_INFO | cut -d ',' -f1)
+              CREATION_TIME=$(echo $POD_INFO | cut -d ',' -f2)
+              
+              POD_CREATION_EPOCH=$(date --date="$CREATION_TIME" +%s)
+              AGE_SECONDS=$((CURRENT_TIME - POD_CREATION_EPOCH))
+              
+              if [ $AGE_SECONDS -le 30 ]; then
+                YOUNG_PODS_EXIST=true
+              else
+                kubectl label pods $POD_NAME -n $NAMESPACE new- --overwrite 2>/dev/null || true
+              fi
+            done
+            
+            if [ "$YOUNG_PODS_EXIST" = false ] && [ -n "$PODS" ]; then
+              for POD_INFO in $PODS; do
+                POD_NAME=$(echo $POD_INFO | cut -d ',' -f1)
+                kubectl label pods $POD_NAME -n $NAMESPACE new=true old=true --overwrite
+              done
+            fi
+      restartPolicy: OnFailure
+---
+# Service Account and RBAC permissions for the CronJob
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: pod-label-manager-sa
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pod-label-manager-role
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "update", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pod-label-manager-rolebinding
+subjects:
+- kind: ServiceAccount
+  name: pod-label-manager-sa
+roleRef:
+  kind: Role
+  name: pod-label-manager-role
+  apiGroup: rbac.authorization.k8s.io
 # ---
 # apiVersion: networking.k8s.io/v1
 # kind: Ingress
