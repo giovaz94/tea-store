@@ -36,14 +36,14 @@ let runningTasks = 0;
 
 
 function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
+  incomingMessages.inc();
   if (requestQueue.length >= max_queue_size) {
     lostMessage.inc(); 
     res.sendStatus(500);
     return;
-  } else {
-    incomingMessages.inc();
-  }
-
+  } 
+  
+  
   const arrivalTime = Date.now(); 
   const ready = new Promise<Task>((resolve) => {
     const task: Task = {req, res, next, arrivalTime, resolve: (task) => resolve(task), };
@@ -66,6 +66,7 @@ function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
     // await axios.post("http://persistence-service/request").catch(err => console.log(err.message));
     runningTasks--;
   });
+  
   console.log("Req parsed");
   res.sendStatus(200);
 }
