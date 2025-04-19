@@ -3,6 +3,7 @@ from datetime import datetime
 from collections import defaultdict
 import pytz
 import time
+import os
  
 # Load kube config
 try:
@@ -11,13 +12,14 @@ except:
     config.load_kube_config()
  
 v1 = client.CoreV1Api()
- 
+pod_age_limit = int(os.environ.get("POD_AGE_LIMIT", "30"))
+
+
 def get_eta_seconds(pod):
     try:
-        eta_str = pod.metadata.annotations.get("eta")
-        eta = datetime.fromisoformat(eta_str.replace("Z", "+00:00"))
+        eta = pod.status.start_time
         now = datetime.now(pytz.utc)
-        return (eta - now).total_seconds()
+        return (now - eta).total_seconds()
     except Exception as e:
         print(f"Failed to parse ETA for pod {pod.metadata.name}: {e}")
         return None
@@ -61,17 +63,17 @@ def main():
             if p.metadata.labels.get("new") == "true" and p.metadata.labels.get("old") == "true"
         ]
  
-        has_eta_below_30 = False
+        has_eta_below_al = False
         for pod in candidate_pods:
             eta_seconds = get_eta_seconds(pod)
-            if eta_seconds is not None and eta_seconds < 30:
-                has_eta_below_30 = True
+            if eta_seconds is not None and eta_seconds < pod_age_limit:
+                has_eta_below_al = True
                 break
  
-        if not has_eta_below_30:
+        if not has_eta_below_al:
             for pod in candidate_pods:
                 eta_seconds = get_eta_seconds(pod)
-                if eta_seconds is None or eta_seconds <= 30:
+                if eta_seconds is None or eta_seconds <= pod_age_limit:
                     continue
                 patch_label(pod.metadata.namespace, pod.metadata.name, "new", "false")
  
