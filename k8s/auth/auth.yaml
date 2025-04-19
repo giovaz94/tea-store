@@ -61,7 +61,7 @@ spec:
     spec:
       template:
         spec:
-          serviceAccountName: scaler-service-account
+          serviceAccountName: scaler-service-account-cluster
           restartPolicy: OnFailure
           containers:
             - name: eta-checker
