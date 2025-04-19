@@ -23,6 +23,9 @@ jobs:
           - dockerfile: ./service/Dockerfile
             context: ./service
             image: giovaz94/tea-store-general
+          - dockerfile: ./job/Dockerfile
+            context: ./job
+            image: giovaz94/tea-store-cj
           
     permissions:
       contents: read
