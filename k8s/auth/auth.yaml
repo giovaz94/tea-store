@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: auth
 spec:
+  replicas: 2
   selector:
     matchLabels:
       app: auth
@@ -60,6 +61,9 @@ spec:
   jobTemplate:
     spec:
       template:
+        metadata:
+          annotations:
+            sidecar.istio.io/inject: "false"  # Disable sidecar injection
         spec:
           serviceAccountName: scaler-service-account-cluster
           restartPolicy: OnFailure
@@ -70,5 +74,7 @@ spec:
               env:
                 - name: TZ
                   value: UTC
+                - eta:
+                  value: "30"
 
  

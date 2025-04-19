@@ -46,6 +46,7 @@ def patch_label(namespace, pod_name, label_key, label_value):
         print(f"Error patching pod {pod_name}: {e}")
  
 def main():
+    time_threshold = os.environ.get("ETA", "30")
     pods = v1.list_pod_for_all_namespaces(watch=False)
  
     pod_groups = defaultdict(list)
@@ -58,7 +59,7 @@ def main():
  
     # First pass: turn off new:true if no pod in group has eta < 30s
     for (namespace, base_name), group_pods in pod_groups.items():
-        candidate_pods = [p for p in group_pods if p.metadata.labels.get("new") == "true" and p.metadata.labels.get("old") == "true"]
+        candidate_pods = [p for p in group_pods if "new" in p.metadata.annotations and "old" in p.metadata.annotations]
 
         eta_list = [get_eta_seconds(p) for p in candidate_pods]
         all_eta_above_30 = all(eta > 30 for eta in eta_list if eta is not None)
