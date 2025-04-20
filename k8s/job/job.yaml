@@ -23,4 +23,4 @@ spec:
                 - name: TZ
                   value: UTC
                 - name: POD_AGE_LIMIT
-                  value: "60"
+                  value: "100"
