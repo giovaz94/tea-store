@@ -4,29 +4,41 @@ from collections import defaultdict
 import pytz
 import time
 import os
- 
+
 # Load kube config
 try:
     config.load_incluster_config()
 except:
     config.load_kube_config()
- 
-v1 = client.CoreV1Api()
-pod_age_limit = int(os.environ.get("POD_AGE_LIMIT", "30"))
 
+v1 = client.CoreV1Api()
+pod_age_limit = int(os.environ.get("POD_AGE_LIMIT", "60"))
+
+def get_ready_time(pod):
+    try:
+        conditions = pod.status.conditions or []
+        for condition in conditions:
+            if condition.type == "Ready" and condition.status == "True":
+                return condition.last_transition_time
+        return None
+    except Exception as e:
+        print(f"Failed to get Ready time for pod {pod.metadata.name}: {e}")
+        return None
 
 def get_eta_seconds(pod):
     try:
-        eta = pod.status.start_time
+        ready_time = get_ready_time(pod)
+        if ready_time is None:
+            return None
         now = datetime.now(pytz.utc)
-        return (now - eta).total_seconds()
+        return (now - ready_time).total_seconds()
     except Exception as e:
         print(f"Failed to parse ETA for pod {pod.metadata.name}: {e}")
         return None
- 
+
 def get_base_name(name):
     return '-'.join(name.split('-')[:-1]) or name
- 
+
 def patch_label(namespace, pod_name, label_key, label_value):
     patch_body = {
         "metadata": {
@@ -44,39 +56,37 @@ def patch_label(namespace, pod_name, label_key, label_value):
         print(f"Patched pod {pod_name} - set {label_key}:{label_value}")
     except Exception as e:
         print(f"Error patching pod {pod_name}: {e}")
- 
+
 def main():
     pods = v1.list_pod_for_all_namespaces(watch=False)
- 
+
     pod_groups = defaultdict(list)
- 
+
     for pod in pods.items:
         labels = pod.metadata.labels or {}
         if "new" in labels and "old" in labels:
             base_name = get_base_name(pod.metadata.name)
             pod_groups[(pod.metadata.namespace, base_name)].append(pod)
- 
-    # First pass: turn off new:true if no pod in group has eta < 30s
+
+    # First pass: turn off new:true if no pod in group has eta < pod_age_limit
     for (namespace, base_name), group_pods in pod_groups.items():
         candidate_pods = [p for p in group_pods if "new" in p.metadata.labels and "old" in p.metadata.labels]
 
         eta_list = [get_eta_seconds(p) for p in candidate_pods]
-        all_eta_above_30 = all(eta > pod_age_limit for eta in eta_list if eta is not None)
+        all_eta_above_limit = all(eta > pod_age_limit for eta in eta_list if eta is not None)
 
-        if all_eta_above_30:
-            for p in candidate_pods:        
+        if all_eta_above_limit:
+            for p in candidate_pods:
                 patch_label(p.metadata.namespace, p.metadata.name, "new", "true")
             continue
 
- 
         for pod in candidate_pods:
             eta_seconds = get_eta_seconds(pod)
             if eta_seconds is None or eta_seconds <= pod_age_limit:
                 continue
             patch_label(pod.metadata.namespace, pod.metadata.name, "new", "false")
- 
- 
+
 if __name__ == "__main__":
-    for i in range(0,18):
+    for i in range(0, 100):
         main()
         time.sleep(5)
