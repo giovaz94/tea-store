@@ -24,7 +24,7 @@ spec:
             - name: SERVICE_NAME
               value: "image"
             - name: MAX_SIZE
-              value: "100"
+              value: "200"
             - name: KEEP_ALIVE
               value: "5000"
             - name: PORT
@@ -58,7 +58,7 @@ spec:
   host: image-service
   trafficPolicy:
     loadBalancer:
-      simple: RANDOM
+      simple: LEAST_REQUEST
 ---
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService

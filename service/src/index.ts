@@ -88,7 +88,7 @@ if(serviceName !== "recommender") {
 
 const webuiTask = async (task: Task) => {
   let response;
-  let executions = Math.floor(Math.random() * 5) + 1;
+  let executions = Math.floor(Math.LEAST_REQUEST() * 5) + 1;
   try {
     response = await request('http://auth-service/request',{
       method: 'POST',
