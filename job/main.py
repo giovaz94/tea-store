@@ -58,6 +58,7 @@ def patch_label(namespace, pod_name, label_key, label_value):
         print(f"Error patching pod {pod_name}: {e}")
 
 def main():
+    print("chechking...")
     pods = v1.list_pod_for_all_namespaces(watch=False)
 
     pod_groups = defaultdict(list)
@@ -77,12 +78,14 @@ def main():
 
         if all_eta_above_limit:
             for p in candidate_pods:
+                if p.metadata.labels.get("new") == "true":
+                    continue
                 patch_label(p.metadata.namespace, p.metadata.name, "new", "true")
             continue
 
         for pod in candidate_pods:
             eta_seconds = get_eta_seconds(pod)
-            if eta_seconds is None or eta_seconds <= pod_age_limit:
+            if eta_seconds is None or eta_seconds <= pod_age_limit or pod.metadata.labels.get("new") == "false":
                 continue
             patch_label(pod.metadata.namespace, pod.metadata.name, "new", "false")
 
