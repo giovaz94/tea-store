@@ -20,18 +20,35 @@ spec:
         ports:
         - containerPort: 80
         env:
-        - name: MCL
-          value: "150"
-        - name: SERVICE_NAME
-          value: "webUI"
-        - name: PORT
-          value: "80"
-        - name: KEEP_ALIVE
-          value: "5000"
-        - name: MAX_SIZE
-          value: "100"
-        - name: OUTPUT_SERVICES
-          value: '{"http://persistence-service/request":"1", "http://recommender-service/request":"1", "http://image-service/request":"2"}'
+          - name: MCL
+            value: "150"
+          - name: SERVICE_NAME
+            value: "webUI"
+          - name: PORT
+            value: "80"
+          - name: KEEP_ALIVE
+            value: "5000"
+          - name: MAX_SIZE
+            value: "100"
+          - name: OUTPUT_SERVICES
+            value: '{"http://persistence-service/request":"1", "http://recommender-service/request":"1", "http://image-service/request":"2"}'
+          - name: HEALTH_THRESHOLD
+            value: "0.8"
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 2
+
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 2
       restartPolicy: Always
 ---
 apiVersion: v1

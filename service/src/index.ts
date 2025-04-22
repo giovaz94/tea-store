@@ -33,7 +33,14 @@ const outputServices: Map<string, string> = new Map(Object.entries(JSON.parse(pr
 const requestQueue: Task[] = [];
 let runningTasks = 0;
 
-
+const healthThresholdPercentage = parseFloat(process.env.HEALTH_THRESHOLD || "0.8");
+app.get("/healthz", (_req: Request, res: Response) => {
+  const currentUsageRatio = requestQueue.length / max_queue_size;
+  if (currentUsageRatio > healthThresholdPercentage) {
+    return res.status(500).send(`Unhealthy: queue usage ${Math.round(currentUsageRatio * 100)}% exceeds threshold`);
+  }
+  res.status(200).send("OK");
+});
 
 function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
   incomingMessages.inc();

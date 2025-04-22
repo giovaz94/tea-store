@@ -32,7 +32,27 @@ spec:
             - name: MAX_SIZE
               value: "100000"
             - name: OUTPUT_SERVICES
-              value: '{"http://persistence-service/request":"1"}' 
+              value: '{"http://persistence-service/request":"1"}'
+            - name: HEALTH_THRESHOLD
+              value: "0.8"
+
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 2
+
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 2
+
+
       restartPolicy: Always
 ---
 apiVersion: v1
