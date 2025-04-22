@@ -15,12 +15,14 @@ type Task = {
 
 ///PROM METRICS///
 const max_queue_size = parseInt(process.env.MAX_SIZE || "50");
+const max_connections = parseInt(process.env.MAX_CONNECTIONS || "40");
+const pipeline_count = parseInt(process.env.PIPELINE_COUNT || "0");
 const serviceName: string = process.env.SERVICE_NAME || "undefinedService";
 const lostMessage = createLostMessageCounter(serviceName);
 const incomingMessages = createIncomingMessageCounter(serviceName);
 const agent = new Agent({
-  connections: 10,      // Increase connections
-  pipelining: 0,         // Keep pipelining off if server doesn't support it
+  connections: max_connections,      // Increase connections
+  pipelining: pipeline_count,         // Keep pipelining off if server doesn't support it
 });
 let behaviourCounter: Counter<string>;
 let behaviourTimeCounter: Counter<string>;
