@@ -55,6 +55,11 @@ metadata:
 spec:
   host: persistence-service
   trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 10
+      http:
+        idleTimeout: 65s   # Match Node.js keepAliveTimeout
     loadBalancer:
       simple: RANDOM
 ---

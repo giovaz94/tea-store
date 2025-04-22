@@ -153,8 +153,8 @@ app.post('/start', (req: Request, res: Response) => {
                 request(url, { 
                     method: 'POST',
                     dispatcher: new Agent({ 
-                      connections: 1,  // Force new connection each time
-                      pipelining: 0    // Disable pipelining
+                      connections: 10,  // Force new connection each time
+                      pipelining: 1    // Disable pipelining
                     })
                   }).catch(err => console.log(err.message));
             }
