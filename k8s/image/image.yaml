@@ -31,6 +31,11 @@ spec:
               value: "80"
             - name: OUTPUT_SERVICES
               value: '{}'
+            - name: MAX_CONNECTIONS
+              value: 70"
+            - name: PIPELINE_COUNT
+              value: "1"
+
 
       restartPolicy: Always
 ---

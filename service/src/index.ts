@@ -95,10 +95,7 @@ const webuiTask = async (task: Task) => {
     response = await request('http://auth-service/request',{
       method: 'POST',
       headers: {'x-traffic-version': 'new',},
-      dispatcher: new Agent({
-        connections: 1,  // Force new connection each time
-        pipelining: 0    // Disable pipelining
-      })
+      dispatcher: agent
     }); 
     //response = await axios.post("http://auth-service/request");
     console.log("Browsing " + executions + " times");

@@ -30,6 +30,10 @@ spec:
             value: "200"
           - name: OUTPUT_SERVICES
             value: '{"http://persistence-service/request":"1", "http://recommender-service/request":"1", "http://image-service/request":"2"}'
+          - name: MAX_CONNECTIONS
+            value: 70"
+          - name: PIPELINE_COUNT
+            value: "1"
       restartPolicy: Always
 ---
 apiVersion: v1

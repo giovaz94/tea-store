@@ -30,6 +30,12 @@ spec:
               value: "200"
             - name: OUTPUT_SERVICES
               value: '{}'
+            - name: MAX_CONNECTIONS
+              value: 70"
+            - name: PIPELINE_COUNT
+              value: "1"
+
+
       restartPolicy: Always
 ---
 apiVersion: v1
