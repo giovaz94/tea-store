@@ -11,6 +11,7 @@ spec:
       labels:
         app: persistence
         new: "true"
+        old: "true"
     spec:
       containers:
         - name: persistence
@@ -66,6 +67,9 @@ spec:
     - name: new
       labels:
         new: "true"
+    - name: old
+      labels:
+        old: "true"
 ---
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
@@ -75,14 +79,13 @@ spec:
   hosts:
     - persistence-service
   http:
-    - match:
-        - headers:
-            x-traffic-version:
-              exact: "new"
-      route:
+    - route:
         - destination:
             host: persistence-service
             subset: new
-          weight: 100
- 
+          weight: 70
+        - destination:
+            host: persistence-service
+            subset: old
+          weight: 30
 

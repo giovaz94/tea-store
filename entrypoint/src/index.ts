@@ -84,7 +84,7 @@ app.post('/start', (req: Request, res: Response) => {
             const r = workload[index++];
             console.log(`Sending ${r} requests per second`);
             for (let i = 0; i < r; i++) {
-                request(url, { method: 'POST',  headers: {'x-traffic-version': 'new',},}).catch(err => console.log(err.message));
+                request(url, { method: 'POST',}).catch(err => console.log(err.message));
             }
             await new Promise(resolve => setTimeout(resolve, 1000));   
         }

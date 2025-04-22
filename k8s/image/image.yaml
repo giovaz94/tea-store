@@ -12,6 +12,7 @@ spec:
       labels:
         app: image
         new: "true"
+        old: "true"
     spec:
       containers:
         - name: image
@@ -60,6 +61,9 @@ spec:
     - name: new
       labels:
         new: "true"
+    - name: old
+      labels:
+        old: "true"
 ---
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
@@ -69,13 +73,12 @@ spec:
   hosts:
     - image-service
   http:
-    - match:
-        - headers:
-            x-traffic-version:
-              exact: "new"
-      route:
+    - route:
         - destination:
             host: image-service
             subset: new
-          weight: 100
-
+          weight: 70
+        - destination:
+            host: image-service
+            subset: old
+          weight: 30

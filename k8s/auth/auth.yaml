@@ -12,6 +12,7 @@ spec:
       labels:
         app: auth
         new: "true"
+        old: "true"
     spec:
       containers:
         - name: auth
@@ -60,6 +61,9 @@ spec:
     - name: new
       labels:
         new: "true"
+    - name: old
+      labels:
+        old: "true"
 ---
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
@@ -69,13 +73,13 @@ spec:
   hosts:
     - auth-service
   http:
-    - match:
-        - headers:
-            x-traffic-version:
-              exact: "new"
-      route:
+    - route:
         - destination:
             host: auth-service
             subset: new
-          weight: 100
+          weight: 70
+        - destination:
+            host: auth-service
+            subset: old
+          weight: 30
  

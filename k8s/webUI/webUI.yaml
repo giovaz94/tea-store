@@ -10,7 +10,8 @@ spec:
     metadata:
       labels:
         app: webui
-        new: "true"  # This label can be changed dynamically (e.g., with your CronJob)
+        new: "true"
+        old: "true"
     spec:
       containers:
       - name: webui
@@ -60,7 +61,10 @@ spec:
   subsets:
     - name: new
       labels:
-        new: "true"  # Label to match the "new" pods
+        new: "true"
+    - name: old
+      labels:
+        old: "true"
 ---
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
@@ -70,12 +74,12 @@ spec:
   hosts:
     - webui-service
   http:
-    - match:
-        - headers:
-            x-traffic-version:
-              exact: "new"
-      route:
+    - route:
         - destination:
             host: webui-service
             subset: new
-          weight: 100
+          weight: 70
+        - destination:
+            host: webui-service
+            subset: old
+          weight: 30
