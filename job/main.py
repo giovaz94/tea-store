@@ -87,6 +87,6 @@ def main():
             patch_label(pod.metadata.namespace, pod.metadata.name, "new", "false")
 
 if __name__ == "__main__":
-    for i in range(0, 100):
+    for i in range(0, 18):
         main()
         time.sleep(5)
