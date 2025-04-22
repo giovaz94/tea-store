@@ -32,24 +32,6 @@ spec:
               value: "100000"
             - name: OUTPUT_SERVICES
               value: '{}'
-            - name: HEALTH_THRESHOLD
-              value: "0.8"
-              
-          livenessProbe:
-            httpGet:
-              path: /healthz
-              port: 80
-            initialDelaySeconds: 5
-            periodSeconds: 10
-            timeoutSeconds: 2
-
-          readinessProbe:
-            httpGet:
-              path: /healthz
-              port: 80
-            initialDelaySeconds: 5
-            periodSeconds: 10
-            timeoutSeconds: 2
 
           resources:
             requests:
