@@ -5,7 +5,7 @@ const app: Application = express();
 const port: string | 8010 = process.env.PORT || 8010;
 const url: string = process.env.ENDPOINT || "http://100.66.83.79:31000/request";
 const agent = new Agent({
-    connections: 20,      // Increase connections
+    connections: 1,      // Increase connections
     pipelining: 0,         // Keep pipelining off if server doesn't support it
   });
 

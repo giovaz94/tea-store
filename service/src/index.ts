@@ -19,8 +19,8 @@ const serviceName: string = process.env.SERVICE_NAME || "undefinedService";
 const lostMessage = createLostMessageCounter(serviceName);
 const incomingMessages = createIncomingMessageCounter(serviceName);
 const agent = new Agent({
-  connections: 10,      // Increase connections
-  pipelining: 1,         // Keep pipelining off if server doesn't support it
+  connections: 1,      // Increase connections
+  pipelining: 0,         // Keep pipelining off if server doesn't support it
 });
 let behaviourCounter: Counter<string>;
 let behaviourTimeCounter: Counter<string>;
@@ -107,11 +107,7 @@ const webuiTask = async (task: Task) => {
         for (let i = 0; i < n; i++) {
           response = await request(url, {
             method: 'POST', 
-            headers: {'x-traffic-version': 'new',},
-            dispatcher: new Agent({
-              connections: 1,  // Force new connection each time
-              pipelining: 0    // Disable pipelining
-            })
+            dispatcher: agent
           }); 
           //response = await axios.post(url);
           if (response.statusCode === 500 && serviceName === "webUI") {
