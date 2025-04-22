@@ -49,13 +49,16 @@ function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
     requestQueue.push(task);
   });
   ready.then(async (task) => {
-    console.log("Req parsed");
-    res.sendStatus(200);
     next();
     if (serviceName === "webUI") await webuiTask(task);
     if (serviceName === "auth") await request(
       'http://persistence-service/request', {
         method: 'POST',
+        headers: {'x-traffic-version': 'new',},
+        dispatcher: new Agent({
+          connections: 1,  // Force new connection each time
+          pipelining: 0    // Disable pipelining
+        })
       }
     ).catch(err => console.log(err.message));
     // await request(
@@ -68,6 +71,9 @@ function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
     // await axios.post("http://persistence-service/request").catch(err => console.log(err.message));
     runningTasks--;
   });
+  
+  console.log("Req parsed");
+  res.sendStatus(200);
 }
 
 const app = express();
@@ -86,6 +92,11 @@ const webuiTask = async (task: Task) => {
   try {
     response = await request('http://auth-service/request',{
       method: 'POST',
+      headers: {'x-traffic-version': 'new',},
+      dispatcher: new Agent({
+        connections: 1,  // Force new connection each time
+        pipelining: 0    // Disable pipelining
+      })
     }); 
     //response = await axios.post("http://auth-service/request");
     console.log("Browsing " + executions + " times");
@@ -95,7 +106,12 @@ const webuiTask = async (task: Task) => {
         console.log(`Sending ${n} requests to ${url}`);
         for (let i = 0; i < n; i++) {
           response = await request(url, {
-            method: 'POST',
+            method: 'POST', 
+            headers: {'x-traffic-version': 'new',},
+            dispatcher: new Agent({
+              connections: 1,  // Force new connection each time
+              pipelining: 0    // Disable pipelining
+            })
           }); 
           //response = await axios.post(url);
           if (response.statusCode === 500 && serviceName === "webUI") {
@@ -127,6 +143,6 @@ if (serviceName !== "recommender") {
 }
 
 const server = app.listen(port, () => {
-  server.keepAliveTimeout = 10000;
+  //server.keepAliveTimeout = 1000;
   console.log(`${serviceName} started and listening on port ${port}`);
 });
