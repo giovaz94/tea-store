@@ -10,8 +10,6 @@ spec:
     metadata:
       labels:
         app: webui
-        new: "true"
-        old: "true"
     spec:
       containers:
       - name: webui
@@ -58,28 +56,31 @@ metadata:
   name: webui-service
 spec:
   host: webui-service
-  subsets:
-    - name: new
-      labels:
-        new: "true"
-    - name: old
-      labels:
-        old: "true"
----
-apiVersion: networking.istio.io/v1beta1
-kind: VirtualService
-metadata:
-  name: webui-service
-spec:
-  hosts:
-    - webui-service
-  http:
-    - route:
-        - destination:
-            host: webui-service
-            subset: new
-          weight: 70
-        - destination:
-            host: webui-service
-            subset: old
-          weight: 30
+  trafficPolicy:
+    loadBalancer:
+      simple: RANDOM
+  # subsets:
+  #   - name: new
+  #     labels:
+  #       new: "true"
+  #   - name: old
+  #     labels:
+  #       old: "true"
+# ---
+# apiVersion: networking.istio.io/v1beta1
+# kind: VirtualService
+# metadata:
+#   name: webui-service
+# spec:
+#   hosts:
+#     - webui-service
+#   http:
+#     - route:
+#         - destination:
+#             host: webui-service
+#             subset: new
+#           weight: 70
+#         - destination:
+#             host: webui-service
+#             subset: old
+#           weight: 30
