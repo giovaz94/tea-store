@@ -58,7 +58,7 @@ spec:
   host: webui-service
   trafficPolicy:
     loadBalancer:
-      simple: RANDOM
+      simple: ROUND_ROBIN
   # subsets:
   #   - name: new
   #     labels:

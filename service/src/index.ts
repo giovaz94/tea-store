@@ -49,6 +49,8 @@ function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
     requestQueue.push(task);
   });
   ready.then(async (task) => {
+    console.log("Req parsed");
+    res.sendStatus(200);
     next();
     if (serviceName === "webUI") await webuiTask(task);
     if (serviceName === "auth") await request('http://persistence-service/request', {method: 'POST',}).catch(err => console.log(err.message));
@@ -62,9 +64,6 @@ function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
     // await axios.post("http://persistence-service/request").catch(err => console.log(err.message));
     runningTasks--;
   });
-  
-  console.log("Req parsed");
-  res.sendStatus(200);
 }
 
 const app = express();
@@ -120,6 +119,6 @@ if (serviceName !== "recommender") {
 }
 
 const server = app.listen(port, () => {
-  //server.keepAliveTimeout = 1000;
+  server.keepAliveTimeout = 10000;
   console.log(`${serviceName} started and listening on port ${port}`);
 });
