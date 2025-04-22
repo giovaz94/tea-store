@@ -143,6 +143,7 @@ if (serviceName !== "recommender") {
 }
 
 const server = app.listen(port, () => {
-  //server.keepAliveTimeout = 1000;
+  server.keepAliveTimeout = 65000; // 65 seconds (AWS ALB default)
+  server.headersTimeout = 66000;   // Must be > keepAliveTimeout
   console.log(`${serviceName} started and listening on port ${port}`);
 });
