@@ -88,11 +88,11 @@ class Guard:
             current_mcl, _ = self.scaler.process_request(last_pred_conf)
 
         while self.running:        
-            tot = self._execute_prometheus_query("sum(increase(http_requests_total_webUI_counter{kubernetes_name='webui-service-prometheus'}[10s]))")
-            completed = self._execute_prometheus_query("sum(increase(behaviour_execution{kubernetes_name='webui-service-prometheus'}[10s]))")
-            latency = self._execute_prometheus_query("sum(increase(behaviour_time_execution{kubernetes_name='webui-service-prometheus'}[10s]))")
+            tot = self._execute_prometheus_query("sum(increase(http_requests_total_webUI_counter[10s]))")
+            completed = self._execute_prometheus_query("sum(increase(behaviour_execution[10s]))")
+            latency = self._execute_prometheus_query("sum(increase(behaviour_time_execution[10s]))")
             avg_lat = latency/(completed if completed > 0 else 1)
-            loss = self._execute_prometheus_query("sum(increase(message_lost_webUI{kubernetes_name='webui-service-prometheus'}[10s]))")
+            loss = self._execute_prometheus_query("sum(increase(message_lost_webUI[10s]))")
             toPrint = str(iter) + " " + str(avg_lat)
               
 

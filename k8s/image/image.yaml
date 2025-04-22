@@ -37,7 +37,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: image-service-prometheus
+  name: image-service
   annotations:
       prometheus.io/scrape: "true"
       prometheus.io/port: "80"
@@ -45,21 +45,6 @@ metadata:
 spec:
   selector:
     app: image
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: image-service
-  annotations:
-      prometheus.io/scrape: "false"
-spec:
-  selector:
-    app: image
-    new: "true"
   ports:
     - protocol: TCP
       port: 80

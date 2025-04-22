@@ -43,7 +43,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: persistence-service-prometheus
+  name: persistence-service
   annotations:
       prometheus.io/scrape: "true"
       prometheus.io/port: "80"
@@ -51,21 +51,6 @@ metadata:
 spec:
   selector:
     app: persistence
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: persistence-service
-  annotations:
-      prometheus.io/scrape: "false"
-spec:
-  selector:
-    app: persistence
-    new: "true"
   ports:
     - protocol: TCP
       port: 80
