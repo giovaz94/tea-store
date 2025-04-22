@@ -32,14 +32,6 @@ spec:
               value: "100000"
             - name: OUTPUT_SERVICES
               value: '{}'
-
-          resources:
-            requests:
-              memory: "300Mi"  
-              cpu: "300m"    
-            limits:
-              memory: "600Mi" 
-              cpu: "600m"  
       restartPolicy: Always
 ---
 apiVersion: v1
