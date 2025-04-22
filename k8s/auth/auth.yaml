@@ -37,7 +37,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: auth-service
+  name: auth-service-prometheus
   annotations:
       prometheus.io/scrape: "true"
       prometheus.io/port: "80"
@@ -45,6 +45,21 @@ metadata:
 spec:
   selector:
     app: auth
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  annotations:
+      prometheus.io/scrape: "false"
+spec:
+  selector:
+    app: auth
+    new: "true"
   ports:
     - protocol: TCP
       port: 80
