@@ -56,10 +56,6 @@ function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
     if (serviceName === "auth") await request(
       'http://persistence-service/request', {
         method: 'POST',
-        dispatcher: new Agent({
-          // connections: 1,  // Force new connection each time
-          pipelining: 0    // Disable pipelining
-        })
       }
     ).catch(err => console.log(err.message));
     // await request(
@@ -90,10 +86,6 @@ const webuiTask = async (task: Task) => {
   try {
     response = await request('http://auth-service/request',{
       method: 'POST',
-      dispatcher: new Agent({
-        // connections: 1,  // Force new connection each time
-        pipelining: 0    // Disable pipelining
-      })
     }); 
     //response = await axios.post("http://auth-service/request");
     console.log("Browsing " + executions + " times");
@@ -104,10 +96,6 @@ const webuiTask = async (task: Task) => {
         for (let i = 0; i < n; i++) {
           response = await request(url, {
             method: 'POST',
-            dispatcher: new Agent({
-              // connections: 1,  // Force new connection each time
-              pipelining: 0    // Disable pipelining
-            })
           }); 
           //response = await axios.post(url);
           if (response.statusCode === 500 && serviceName === "webUI") {
