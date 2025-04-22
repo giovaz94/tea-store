@@ -1,5 +1,5 @@
 import express, {Request, Response , Application } from 'express';
-import { request } from 'undici';
+import { Agent, request } from 'undici';
 
 const app: Application = express();
 const port: string | 8010 = process.env.PORT || 8010;
@@ -84,7 +84,14 @@ app.post('/start', (req: Request, res: Response) => {
             const r = workload[index++];
             console.log(`Sending ${r} requests per second`);
             for (let i = 0; i < r; i++) {
-                request(url, { method: 'POST',}).catch(err => console.log(err.message));
+                // request(url, { method: 'POST',}).catch(err => console.log(err.message));
+                request(url, { 
+                    method: 'POST',
+                    dispatcher: new Agent({ 
+                      connections: 1,  // Force new connection each time
+                      pipelining: 0    // Disable pipelining
+                    })
+                  }).catch(err => console.log(err.message));
             }
             await new Promise(resolve => setTimeout(resolve, 1000));   
         }
