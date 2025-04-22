@@ -27,7 +27,7 @@ spec:
             - name: KEEP_ALIVE
               value: "5000"
             - name: MAX_SIZE
-              value: "100000"
+              value: "100"
             - name: OUTPUT_SERVICES
               value: '{}'
       restartPolicy: Always
