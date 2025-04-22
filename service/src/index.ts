@@ -18,6 +18,10 @@ const max_queue_size = parseInt(process.env.MAX_SIZE || "50");
 const serviceName: string = process.env.SERVICE_NAME || "undefinedService";
 const lostMessage = createLostMessageCounter(serviceName);
 const incomingMessages = createIncomingMessageCounter(serviceName);
+const agent = new Agent({
+  connections: 10,      // Increase connections
+  pipelining: 1,         // Keep pipelining off if server doesn't support it
+});
 let behaviourCounter: Counter<string>;
 let behaviourTimeCounter: Counter<string>;
 if (serviceName === "webUI") {
@@ -54,11 +58,7 @@ function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
     if (serviceName === "auth") await request(
       'http://persistence-service/request', {
         method: 'POST',
-        headers: {'x-traffic-version': 'new',},
-        dispatcher: new Agent({
-          connections: 1,  // Force new connection each time
-          pipelining: 0    // Disable pipelining
-        })
+        dispatcher: agent
       }
     ).catch(err => console.log(err.message));
     // await request(

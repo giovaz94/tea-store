@@ -4,6 +4,10 @@ import { Agent, request } from 'undici';
 const app: Application = express();
 const port: string | 8010 = process.env.PORT || 8010;
 const url: string = process.env.ENDPOINT || "http://100.66.83.79:31000/request";
+const agent = new Agent({
+    connections: 20,      // Increase connections
+    pipelining: 0,         // Keep pipelining off if server doesn't support it
+  });
 
 //enron standard
 const workload = [
@@ -152,10 +156,7 @@ app.post('/start', (req: Request, res: Response) => {
                 // request(url, { method: 'POST',}).catch(err => console.log(err.message));
                 request(url, { 
                     method: 'POST',
-                    dispatcher: new Agent({ 
-                      connections: 20,  // Force new connection each time
-                      pipelining: 1    // Disable pipelining
-                    })
+                    dispatcher: agent
                   }).catch(err => console.log(err.message));
             }
             await new Promise(resolve => setTimeout(resolve, 1000));   
