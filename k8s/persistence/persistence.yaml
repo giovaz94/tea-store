@@ -10,8 +10,6 @@ spec:
     metadata:
       labels:
         app: persistence
-        new: "true"
-        old: "true"
     spec:
       containers:
         - name: persistence
@@ -59,4 +57,15 @@ spec:
   trafficPolicy:
     loadBalancer:
       simple: RANDOM
-
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: persistence-service
+spec:
+  hosts:
+    - persistence-service
+  http:
+    - route:
+        - destination:
+            host: persistence-service

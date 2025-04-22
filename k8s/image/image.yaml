@@ -11,8 +11,6 @@ spec:
     metadata:
       labels:
         app: image
-        new: "true"
-        old: "true"
     spec:
       containers:
         - name: image
@@ -61,3 +59,15 @@ spec:
   trafficPolicy:
     loadBalancer:
       simple: RANDOM
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: image-service
+spec:
+  hosts:
+    - image-service
+  http:
+    - route:
+        - destination:
+            host: image-service
