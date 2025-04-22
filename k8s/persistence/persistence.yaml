@@ -14,7 +14,7 @@ spec:
       containers:
         - name: persistence
           image: giovaz94/tea-store-general 
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
           env:

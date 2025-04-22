@@ -19,7 +19,7 @@ const serviceName: string = process.env.SERVICE_NAME || "undefinedService";
 const lostMessage = createLostMessageCounter(serviceName);
 const incomingMessages = createIncomingMessageCounter(serviceName);
 const agent = new Agent({
-  connections: 1,      // Increase connections
+  connections: 10,      // Increase connections
   pipelining: 0,         // Keep pipelining off if server doesn't support it
 });
 let behaviourCounter: Counter<string>;
