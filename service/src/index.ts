@@ -57,7 +57,7 @@ function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
       'http://persistence-service/request', {
         method: 'POST',
         dispatcher: new Agent({
-          connections: 1,  // Force new connection each time
+          // connections: 1,  // Force new connection each time
           pipelining: 0    // Disable pipelining
         })
       }
@@ -91,7 +91,7 @@ const webuiTask = async (task: Task) => {
     response = await request('http://auth-service/request',{
       method: 'POST',
       dispatcher: new Agent({
-        connections: 1,  // Force new connection each time
+        // connections: 1,  // Force new connection each time
         pipelining: 0    // Disable pipelining
       })
     }); 
@@ -105,7 +105,7 @@ const webuiTask = async (task: Task) => {
           response = await request(url, {
             method: 'POST',
             dispatcher: new Agent({
-              connections: 1,  // Force new connection each time
+              // connections: 1,  // Force new connection each time
               pipelining: 0    // Disable pipelining
             })
           }); 
