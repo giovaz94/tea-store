@@ -11,7 +11,6 @@ spec:
       labels:
         app: webui
         new: "true"  # This label can be changed dynamically (e.g., with your CronJob)
-        old: "true" # Change dynamically if needed
     spec:
       containers:
       - name: webui
@@ -62,9 +61,6 @@ spec:
     - name: new
       labels:
         new: "true"  # Label to match the "new" pods
-    - name: old
-      labels:
-        old: "true"  # Label to match the "old" pods
 ---
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
