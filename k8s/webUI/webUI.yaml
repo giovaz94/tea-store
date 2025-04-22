@@ -58,29 +58,4 @@ spec:
   host: webui-service
   trafficPolicy:
     loadBalancer:
-      simple: ROUND_ROBIN
-  # subsets:
-  #   - name: new
-  #     labels:
-  #       new: "true"
-  #   - name: old
-  #     labels:
-  #       old: "true"
-# ---
-# apiVersion: networking.istio.io/v1beta1
-# kind: VirtualService
-# metadata:
-#   name: webui-service
-# spec:
-#   hosts:
-#     - webui-service
-#   http:
-#     - route:
-#         - destination:
-#             host: webui-service
-#             subset: new
-#           weight: 70
-#         - destination:
-#             host: webui-service
-#             subset: old
-#           weight: 30
+      simple: RANDOM

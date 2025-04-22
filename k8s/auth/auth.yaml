@@ -58,29 +58,6 @@ metadata:
   name: auth-service
 spec:
   host: auth-service
-  subsets:
-    - name: new
-      labels:
-        new: "true"
-    - name: old
-      labels:
-        old: "true"
----
-apiVersion: networking.istio.io/v1beta1
-kind: VirtualService
-metadata:
-  name: auth-service
-spec:
-  hosts:
-    - auth-service
-  http:
-    - route:
-        - destination:
-            host: auth-service
-            subset: new
-          weight: 70
-        - destination:
-            host: auth-service
-            subset: old
-          weight: 30
- 
+  trafficPolicy:
+    loadBalancer:
+      simple: RANDOM
