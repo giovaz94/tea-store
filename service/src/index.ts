@@ -79,7 +79,7 @@ const webuiTask = async (task: Task) => {
         const n = parseInt(numberOfRequests, 10);
         for (let i = 0; i < n; i++) {
           response = await request(url, { method: 'POST', dispatcher: agent }); 
-          if (response.statusCode === 500 && serviceName === "webUI") {
+          if (response.statusCode === 500) {
             lostMessage.inc(); 
             break;
           }
