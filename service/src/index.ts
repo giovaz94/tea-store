@@ -34,21 +34,18 @@ if (serviceName === "webUI") {
 
 if (process.env.MCL === undefined) throw new Error("The MCL for the following service isn't defined");
 const mcl: number = parseInt(process.env.MCL as string, 10);
-const maxConcurrentTasks = parseInt(process.env.MAX_CONCURRENCY || "10000");
 const outputServices: Map<string, string> = new Map(Object.entries(JSON.parse(process.env.OUTPUT_SERVICES || "{}")),);
 const requestQueue: Task[] = [];
-let runningTasks = 0;
 
 function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
+  console.log("Req received");
   incomingMessages.inc();
   if (requestQueue.length >= max_queue_size) {
     console.log("----message loss----");
     lostMessage.inc(); 
     res.sendStatus(500);
     return;
-  } 
-  
-  
+  }
   const arrivalTime = Date.now(); 
   const ready = new Promise<Task>((resolve) => {
     const task: Task = {req, res, next, arrivalTime, resolve: (task) => resolve(task), };
@@ -57,24 +54,8 @@ function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
   ready.then(async (task) => {
     next();
     if (serviceName === "webUI") await webuiTask(task);
-    if (serviceName === "auth") await request(
-      'http://persistence-service/request', {
-        method: 'POST',
-        dispatcher: agent
-      }
-    ).catch(err => console.log(err.message));
-    // await request(
-    //   'http://persistence-service/request', 
-    //   { 
-    //     method: 'POST',
-    //     dispatcher: new Agent({pipelining: 0})
-    //   }
-    // ).catch(err => console.log(err.message));
-    // await axios.post("http://persistence-service/request").catch(err => console.log(err.message));
-    runningTasks--;
+    if (serviceName === "auth") await request('http://persistence-service/request', { method: 'POST', dispatcher: agent }).catch(err => console.log(err.message));
   });
-  
-  console.log("Req parsed");
   res.sendStatus(200);
 }
 
@@ -92,23 +73,12 @@ const webuiTask = async (task: Task) => {
   let response;
   let executions = Math.floor(Math.random() * 5) + 1;
   try {
-    response = await request('http://auth-service/request',{
-      method: 'POST',
-      headers: {'x-traffic-version': 'new',},
-      dispatcher: agent
-    }); 
-    //response = await axios.post("http://auth-service/request");
-    console.log("Browsing " + executions + " times");
+    response = await request('http://auth-service/request',{ method: 'POST', dispatcher: agent }); 
     while (executions > 0 && response.statusCode !== 500) {
       for (const [url, numberOfRequests] of outputServices.entries()) {
         const n = parseInt(numberOfRequests, 10);
-        console.log(`Sending ${n} requests to ${url}`);
         for (let i = 0; i < n; i++) {
-          response = await request(url, {
-            method: 'POST', 
-            dispatcher: agent
-          }); 
-          //response = await axios.post(url);
+          response = await request(url, { method: 'POST', dispatcher: agent }); 
           if (response.statusCode === 500 && serviceName === "webUI") {
             lostMessage.inc(); 
             break;
@@ -128,12 +98,8 @@ const webuiTask = async (task: Task) => {
 
 if (serviceName !== "recommender") {
   setInterval(() => {
-    if (runningTasks >= maxConcurrentTasks) return;
     const task = requestQueue.shift();
-    if (task) {
-      runningTasks++;
-      task.resolve(task);
-    }
+    if (task) task.resolve(task);
   }, 1000 / mcl);
 }
 
