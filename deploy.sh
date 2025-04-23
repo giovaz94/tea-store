@@ -39,7 +39,7 @@ deploy_global() {
   echo -e "${GREEN}Deploying gs-algorithm...${NC}"
   kubectl apply -f "$K8S_DIR/gs-algorithm" && check_error
 
-  echo -e "${GREEN}Deploying persistence...${NC}"
+  echo -e "${GREEN}Deploying image...${NC}"
   kubectl apply -f "$K8S_DIR/image/image.yaml" && check_error
   
   echo -e "${GREEN}Deploying persistence...${NC}"
@@ -75,7 +75,7 @@ deploy_local() {
   echo -e "${GREEN}Deploying persistence...${NC}"
   kubectl apply -f "$K8S_DIR/persistence" && check_error
 
-  echo -e "${GREEN}Deploying persistence...${NC}"
+  echo -e "${GREEN}Deploying image...${NC}"
   kubectl apply -f "$K8S_DIR/image" && check_error
   
   echo -e "${GREEN}Deploying recommender...${NC}"

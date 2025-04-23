@@ -8,7 +8,7 @@ spec:
   containers:
     - name: persistence
       image: giovaz94/tea-store-general 
-      imagePullPolicy: Always
+      imagePullPolicy: IfNotPresent
       ports:
         - containerPort: 80
       env:
@@ -19,7 +19,11 @@ spec:
         - name: PORT
           value: "80"
         - name: MAX_SIZE
-          value: "300"
+          value: "1500000"
         - name: OUTPUT_SERVICES
           value: '{}'
+        - name: MAX_CONNECTIONS
+          value: "70"
+        - name: PIPELINE_COUNT
+          value: "1"
   restartPolicy: Always
