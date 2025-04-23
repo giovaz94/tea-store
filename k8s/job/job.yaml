@@ -18,7 +18,7 @@ spec:
           containers:
             - name: eta-checker
               image: giovaz94/tea-store-cj
-              imagePullPolicy: IfNotPresent
+              imagePullPolicy: Always
               env:
                 - name: TZ
                   value: UTC
