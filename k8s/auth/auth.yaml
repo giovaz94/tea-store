@@ -23,8 +23,6 @@ spec:
               value: "190"
             - name: SERVICE_NAME
               value: "auth"
-            - name: KEEP_ALIVE
-              value: "5000"
             - name: PORT
               value: "80"
             - name: MAX_SIZE

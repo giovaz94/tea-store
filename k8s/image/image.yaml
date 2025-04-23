@@ -25,8 +25,6 @@ spec:
               value: "image"
             - name: MAX_SIZE
               value: "200"
-            - name: KEEP_ALIVE
-              value: "5000"
             - name: PORT
               value: "80"
             - name: OUTPUT_SERVICES
@@ -35,8 +33,6 @@ spec:
               value: 70"
             - name: PIPELINE_COUNT
               value: "1"
-
-
       restartPolicy: Always
 ---
 apiVersion: v1

@@ -24,8 +24,6 @@ spec:
             value: "webUI"
           - name: PORT
             value: "80"
-          - name: KEEP_ALIVE
-            value: "5000"
           - name: MAX_SIZE
             value: "200"
           - name: OUTPUT_SERVICES
