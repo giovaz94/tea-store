@@ -53,7 +53,7 @@ function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
   });
   ready.then(async (task) => {
     next();
-    if (serviceName === "webUI") await webuiTask(task);
+    if (serviceName === "webUI") webuiTask(task);
     if (serviceName === "auth") await request('http://persistence-service/request', { method: 'POST', dispatcher: agent }).catch(err => console.log(err.message));
   });
   res.sendStatus(200);
