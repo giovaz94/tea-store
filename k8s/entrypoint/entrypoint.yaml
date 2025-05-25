@@ -17,7 +17,7 @@ spec:
       containers:
         - name: entrypoint
           image: giovaz94/tea-store-ep
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
           env:
