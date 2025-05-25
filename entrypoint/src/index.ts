@@ -145,6 +145,15 @@ const workload = [
 // ];
 
 var stop = false;
+
+app.post('/request', (req: Request, res: Response) => {
+    request(url, { 
+        method: 'POST',
+        dispatcher: agent
+    }).catch(err => console.log(err.message));
+    return res.status(201).send("Request correctly submitted to the entrypoint!");
+});
+
 app.post('/start', (req: Request, res: Response) => {
     stop = false;
     var index = 0;

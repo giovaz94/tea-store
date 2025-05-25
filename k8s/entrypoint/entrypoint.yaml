@@ -30,15 +30,17 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  labels:
-    app: entrypoint
   name: entrypoint-service
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "80"
+    prometheus.io/path: "/metrics"
 spec:
   type: NodePort
-  ports:
-    - port: 80
-      targetPort: 80
-      protocol: TCP
-      nodePort: 31001
   selector:
     app: entrypoint
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 31000
