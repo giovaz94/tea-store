@@ -81,6 +81,9 @@ deploy_local() {
   echo -e "${GREEN}Deploying recommender...${NC}"
   kubectl apply -f "$K8S_DIR/recommender" && check_error
   
+  echo -e "${GREEN}Deploying monitor...${NC}"
+  kubectl apply -f "$K8S_DIR/gs-algorithm" && check_error
+
   echo -e "${GREEN}Deploying webUI...${NC}"
   kubectl apply -f "$K8S_DIR/webUI" && check_error
 
