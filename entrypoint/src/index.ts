@@ -146,7 +146,7 @@ const workload = [
 
 var stop = false;
 
-app.post('/request', (req: Request, res: Response) => {
+app.post('/request', async (req: Request, res: Response) => {
     request(url, { 
         method: 'POST',
         dispatcher: agent

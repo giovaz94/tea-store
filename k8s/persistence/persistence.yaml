@@ -25,7 +25,7 @@ spec:
             - name: PORT
               value: "80"
             - name: MAX_SIZE
-              value: "800"
+              value: "1000"
             - name: OUTPUT_SERVICES
               value: '{}'
             - name: MAX_CONNECTIONS
