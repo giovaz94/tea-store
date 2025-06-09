@@ -9,7 +9,6 @@ import requests
 
 
 class Guard:
-
     def __init__(
             self,
             scaler: SysScaler,
@@ -30,8 +29,8 @@ class Guard:
         self.scaler = scaler
         self.mixer = mixer
 
-        prometheus_service_address = os.environ.get("PROMETHEUS_SERVICE_ADDRESS", "100.66.83.79")
-        prometheus_service_port = os.environ.get("PROMETHEUS_SERVICE_PORT", "30000")
+        prometheus_service_address = os.environ.get("PROMETHEUS_SERVICE_ADDRESS", "localhost")
+        prometheus_service_port = os.environ.get("PROMETHEUS_SERVICE_PORT", "64155")
 
         self.monitor_only = os.environ.get("MONITOR_ONLY", "false").lower() == 'true'
         prometheus_url = f"http://{prometheus_service_address}:{prometheus_service_port}"

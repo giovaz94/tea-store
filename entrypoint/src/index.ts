@@ -151,7 +151,7 @@ app.post('/request', async (req: Request, res: Response) => {
         method: 'POST',
         dispatcher: agent
     }).catch(err => console.log(err.message));
-    return res.status(201).send("Request correctly submitted to the entrypoint!");
+    return res.sendStatus(201)
 });
 
 app.post('/start', (req: Request, res: Response) => {

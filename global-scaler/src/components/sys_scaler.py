@@ -118,7 +118,6 @@ class SysScaler:
             num = int(inc_idx[i])
             iter_number = abs(num)
 
-            start = time.time()
             for _ in range(iter_number):
                 for file in manifest_files:
                     if num > 0:
@@ -134,4 +133,3 @@ class SysScaler:
                             self.el.call_soon_threadsafe(
                                 lambda name=generate_name, node=node_name: delete_pod(self.k8s_client, name, node)
                             )
-            stop = time.time()
