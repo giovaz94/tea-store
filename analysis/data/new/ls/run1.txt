@@ -21,4 +21,4 @@
 200 27.241015648552114 measured: 336.2567884920635 tot: 3362.567884920635 comp: 3372.4293789682542 rej: 0.0 supp: 150.0 inst: 17.0
 210 19.747561719119933 measured: 124.20963888888889 tot: 1242.096388888889 comp: 1220.3156111111111 rej: 0.0 supp: 150.0 inst: 11.0
 220 0.0 measured: 0.0 tot: 0.0 comp: 0.0 rej: 0.0 supp: 150.0 inst: 6.0
-230 0.0 measured: 0.0 tot: 0.0 comp: 0.0 rej: 0.0 supp: 150.0 inst: 6.0s
+230 0.0 measured: 0.0 tot: 0.0 comp: 0.0 rej: 0.0 supp: 150.0 inst: 6.0
