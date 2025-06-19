@@ -21,7 +21,7 @@ spec:
             - containerPort: 7001
           env:
             - name: SLEEP_TIME
-              value: "10"
+              value: "20"
             - name: COMPONENT_MCL
               value: "190"
             - name: COMPONENT_MF
