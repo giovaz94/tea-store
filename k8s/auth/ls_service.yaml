@@ -26,7 +26,7 @@ spec:
               value: "190"
             - name: COMPONENT_MF
               value: "1"
-            - name: K_BIG
+            - name: K_BIGs
               value: "10"
             - name: K
               value: "5"
