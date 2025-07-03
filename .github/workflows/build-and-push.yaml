@@ -14,19 +14,12 @@ jobs:
           - dockerfile: ./entrypoint/Dockerfile
             context: ./entrypoint
             image: giovaz94/tea-store-ep
-          - dockerfile: ./global-scaler/Dockerfile
-            context: ./global-scaler
-            image: giovaz94/tea-store-gs
           - dockerfile: ./local-scaling/Dockerfile
             context: ./local-scaling
             image: giovaz94/tea-store-ls
           - dockerfile: ./service/Dockerfile
             context: ./service
             image: giovaz94/tea-store-general
-          - dockerfile: ./job/Dockerfile
-            context: ./job
-            image: giovaz94/tea-store-cj
-          
     permissions:
       contents: read
       packages: write
